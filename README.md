@@ -29,8 +29,10 @@ Plain HTML, CSS, and JavaScript — no framework, no build step, no dependencies
 | `style.css` | Notepad-style theme, layout, responsive rules |
 | `app.js` | State management, rendering, file/link CRUD, standalone PWA install prompt & lifecycle, service worker registration |
 | `manifest.json` | PWA metadata — app id, standalone display mode, display override, icons, theme colors |
-| `service-worker.js` | Caches app assets for offline use (v4) |
-| `icons/` | App icons (192px, 512px, and a maskable 512px for adaptive icons) |
+| `service-worker.js` | Caches app assets for offline use (v7) |
+| `icon-192.png` | 192px app icon |
+| `icon-512.png` | 512px app icon |
+| `icon-maskable-512.png` | 512px maskable adaptive app icon |
 
 ---
 
@@ -68,10 +70,10 @@ linkvault/
 ├── app.js
 ├── manifest.json
 ├── service-worker.js
-├── icons/
-│   ├── icon-192.png
-│   ├── icon-512.png
-│   └── icon-maskable-512.png
+├── _headers
+├── icon-192.png
+├── icon-512.png
+├── icon-maskable-512.png
 └── README.md
 ```
 
