@@ -484,11 +484,22 @@
 
   // ---------- Service worker ----------
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
+    const registerSW = () => {
       navigator.serviceWorker
         .register("service-worker.js")
-        .catch(() => { /* offline-first fallback */ });
-    });
+        .then((reg) => {
+          console.log("Service Worker registered successfully:", reg.scope);
+        })
+        .catch((err) => {
+          console.warn("Service Worker registration failed:", err);
+        });
+    };
+
+    if (document.readyState === "complete") {
+      registerSW();
+    } else {
+      window.addEventListener("load", registerSW);
+    }
   }
 
   // ---------- Init ----------

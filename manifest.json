@@ -1,10 +1,10 @@
 {
-  "id": "/index.html",
-  "name": "LinkVault ",
+  "id": "/",
+  "name": "LinkVault — My Saved Links",
   "short_name": "LinkVault",
   "description": "Personal offline vault for organizing saved links and resources into files.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "display_override": [
     "window-controls-overlay",
@@ -24,6 +24,12 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icons/icon-512.png",
