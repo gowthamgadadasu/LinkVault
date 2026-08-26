@@ -1,13 +1,23 @@
 {
-  "name": "LinkVault \u2014 My Saved Links",
+  "id": "/index.html",
+  "name": "LinkVault ",
   "short_name": "LinkVault",
-  "description": "Personal offline notebook for organizing saved links and resources.",
+  "description": "Personal offline vault for organizing saved links and resources into files.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
   "background_color": "#faf7f0",
   "theme_color": "#1e293b",
+  "categories": [
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",

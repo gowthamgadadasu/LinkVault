@@ -117,42 +117,58 @@ main {
 .empty-state .glyph { font-size: 40px; display: block; margin-bottom: 10px; }
 .empty-state p { font-size: 16px; line-height: 1.5; }
 
-.notebook-grid {
+.file-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
-.notebook-card {
+.file-card {
   background: #fff;
   border: 1px solid var(--paper-line);
   border-radius: var(--radius);
-  padding: 16px 14px;
+  padding: 14px 14px;
   box-shadow: var(--card-shadow);
   cursor: pointer;
   position: relative;
-  min-height: 108px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
-.notebook-card:active { transform: scale(0.98); }
-.notebook-card .stripe {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 6px;
-  border-radius: var(--radius) 0 0 var(--radius);
+.file-card:active { transform: scale(0.98); }
+.file-card .file-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
-.notebook-card .nb-name {
-  font-size: 18px;
+.file-card .file-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.file-card .file-tag {
+  font-size: 11px;
   font-weight: 700;
-  padding-left: 8px;
-  word-break: break-word;
+  color: var(--gold-deep);
+  background: rgba(212, 175, 55, 0.16);
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
-.notebook-card .nb-meta {
-  font-size: 12.5px;
+.file-card .file-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  word-break: break-word;
+  line-height: 1.25;
+  margin-bottom: 6px;
+  flex: 1;
+}
+.file-card .file-meta {
+  font-size: 11.5px;
   color: var(--ink-soft);
-  padding-left: 8px;
 }
 
 .link-row {
@@ -196,6 +212,13 @@ main {
   font-family: inherit;
 }
 .link-row .row-actions button:active { color: var(--danger); }
+
+/* ---------- Top bar Install Button ---------- */
+.install-top-btn {
+  font-size: 18px !important;
+  color: var(--gold-deep) !important;
+  padding: 4px 6px !important;
+}
 
 /* ---------- FAB ---------- */
 .fab {
@@ -268,13 +291,6 @@ main {
 }
 .sheet input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
 
-.color-row { display: flex; gap: 10px; margin-top: 6px; }
-.color-dot {
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 2px solid transparent; cursor: pointer;
-}
-.color-dot.selected { border-color: var(--ink); }
-
 .sheet-actions {
   display: flex;
   gap: 10px;
@@ -314,31 +330,61 @@ main {
 .toast.show { opacity: 1; }
 
 .install-banner {
-  margin: 0 4px 12px;
+  margin: 0 4px 14px;
   background: #fff;
   border: 1px solid var(--gold);
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  font-size: 14px;
+  box-shadow: var(--card-shadow);
 }
-.install-banner button {
+.install-banner .install-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.install-banner .install-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+.install-banner .install-desc {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.3;
+}
+.install-banner .install-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.install-banner button#installNowBtn {
   background: var(--ink);
   color: var(--gold);
   border: none;
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   font-family: inherit;
   font-weight: 700;
+  font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
 }
+.install-banner button#installNowBtn:active {
+  transform: scale(0.96);
+}
 .install-banner .dismiss {
   background: none;
+  border: none;
   color: var(--ink-soft);
-  font-size: 18px;
+  font-size: 20px;
+  line-height: 1;
   padding: 4px 6px;
+  cursor: pointer;
 }
 .install-banner.hidden { display: none; }

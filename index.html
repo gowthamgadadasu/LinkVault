@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>LinkVault — My Saved Links</title>
 <meta name="theme-color" content="#1e293b" />
-<meta name="description" content="Personal offline notebook for organizing saved links and resources." />
+<meta name="description" content="Personal offline vault for organizing saved links and resources into files." />
 
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" href="icons/icon-192.png" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="LinkVault" />
+<meta name="application-name" content="LinkVault" />
 
 <link rel="stylesheet" href="style.css" />
 </head>
@@ -23,6 +25,7 @@
   <header class="topbar">
     <button class="back-btn" id="backBtn" aria-label="Back">&#8592;</button>
     <h1 id="pageTitle">LinkVault</h1>
+    <button class="icon-btn install-top-btn" id="installTopBtn" aria-label="Install App" title="Install LinkVault as an Application" style="display:none;">&#128229;</button>
     <button class="icon-btn" id="searchToggle" aria-label="Search">&#128269;</button>
   </header>
 
@@ -34,17 +37,15 @@
 
   <button class="fab" id="fabBtn" aria-label="Add">+</button>
 
-  <!-- Notebook create/edit sheet -->
-  <div class="overlay hidden" id="notebookOverlay">
+  <!-- File create/edit sheet -->
+  <div class="overlay hidden" id="fileOverlay">
     <div class="sheet">
-      <h2 id="notebookSheetTitle">New Notebook</h2>
-      <label for="notebookNameInput">Notebook name</label>
-      <input type="text" id="notebookNameInput" placeholder="e.g. React Tutorials, Interview Prep..." maxlength="60" />
-      <label>Color</label>
-      <div class="color-row" id="colorRow"></div>
+      <h2 id="fileSheetTitle">New File</h2>
+      <label for="fileNameInput">File name</label>
+      <input type="text" id="fileNameInput" placeholder="e.g. React Tutorials, Interview Prep..." maxlength="60" />
       <div class="sheet-actions">
-        <button class="btn-secondary" id="notebookCancelBtn">Cancel</button>
-        <button class="btn-primary" id="notebookSaveBtn">Save</button>
+        <button class="btn-secondary" id="fileCancelBtn">Cancel</button>
+        <button class="btn-primary" id="fileSaveBtn">Save</button>
       </div>
     </div>
   </div>
