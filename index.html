@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>LinkVault — My Saved Links</title>
+<meta name="theme-color" content="#1e293b" />
+<meta name="description" content="Personal offline notebook for organizing saved links and resources." />
+
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="LinkVault" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" aria-label="Back">&#8592;</button>
+    <h1 id="pageTitle">LinkVault</h1>
+    <button class="icon-btn" id="searchToggle" aria-label="Search">&#128269;</button>
+  </header>
+
+  <div class="search-wrap" id="searchWrap" style="display:none;">
+    <input type="text" id="searchInput" placeholder="Search..." autocomplete="off" />
+  </div>
+
+  <main id="mainView"></main>
+
+  <button class="fab" id="fabBtn" aria-label="Add">+</button>
+
+  <!-- Notebook create/edit sheet -->
+  <div class="overlay hidden" id="notebookOverlay">
+    <div class="sheet">
+      <h2 id="notebookSheetTitle">New Notebook</h2>
+      <label for="notebookNameInput">Notebook name</label>
+      <input type="text" id="notebookNameInput" placeholder="e.g. React Tutorials, Interview Prep..." maxlength="60" />
+      <label>Color</label>
+      <div class="color-row" id="colorRow"></div>
+      <div class="sheet-actions">
+        <button class="btn-secondary" id="notebookCancelBtn">Cancel</button>
+        <button class="btn-primary" id="notebookSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link create/edit sheet -->
+  <div class="overlay hidden" id="linkOverlay">
+    <div class="sheet">
+      <h2 id="linkSheetTitle">New Link</h2>
+      <label for="linkNameInput">Name this link</label>
+      <input type="text" id="linkNameInput" placeholder="e.g. Dynamic Programming Playlist" maxlength="80" />
+      <label for="linkUrlInput">Paste the link</label>
+      <input type="url" id="linkUrlInput" placeholder="https://..." inputmode="url" />
+      <div class="sheet-actions">
+        <button class="btn-secondary" id="linkCancelBtn">Cancel</button>
+        <button class="btn-primary" id="linkSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm delete sheet -->
+  <div class="overlay hidden" id="confirmOverlay">
+    <div class="sheet">
+      <h2 id="confirmTitle">Delete this?</h2>
+      <p id="confirmBody" style="color:var(--ink-soft); font-size:14px;"></p>
+      <div class="sheet-actions">
+        <button class="btn-secondary" id="confirmCancelBtn">Cancel</button>
+        <button class="btn-danger" id="confirmOkBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
