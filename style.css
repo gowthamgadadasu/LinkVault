@@ -48,8 +48,7 @@ header.topbar {
   align-items: center;
   gap: 10px;
   padding: 16px 18px 12px;
-  background: linear-gradient(var(--paper) 80%, transparent);
-  backdrop-filter: blur(2px);
+  background: var(--paper);
 }
 
 header.topbar .back-btn {
@@ -202,8 +201,7 @@ main {
 .fab {
   position: fixed;
   bottom: 26px;
-  left: 50%;
-  transform: translateX(calc(-1 * min(280px, 50vw) + 26px));
+  right: 24px;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -217,12 +215,16 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.1s ease;
 }
 @media (min-width: 561px) {
-  .fab { left: calc(50% + 280px - 84px); transform: none; }
+  .fab { right: calc(50vw - 280px + 24px); }
 }
-.fab:active { transform: scale(0.94); }
-@media (min-width: 561px) { .fab:active { transform: scale(0.94); } }
+.fab:active { transform: translateZ(0) scale(0.94); }
 
 /* ---------- Modal / sheet ---------- */
 .overlay {
