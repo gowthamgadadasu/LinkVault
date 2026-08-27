@@ -1,20 +1,50 @@
-import {
-  initFirebase,
-  getActiveFirebaseConfig,
-  saveFirebaseConfig,
-  loginWithGoogle,
-  logoutUser,
-  listenToAuth,
-  subscribeToUserCloudData,
-  saveUserCloudData
-} from "./firebase-config.js";
-
 (() => {
   "use strict";
 
   const STORAGE_KEY = "linkvault.data.v1";
+  const FIREBASE_CONFIG_KEY = "linkvault.firebase.config.v1";
 
-  // ---------- Storage ----------
+  // ---------- Firebase Config Helpers ----------
+  function getActiveFirebaseConfig() {
+    try {
+      const saved = localStorage.getItem(FIREBASE_CONFIG_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.apiKey && parsed.apiKey !== "YOUR_API_KEY") return parsed;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function saveFirebaseConfig(cfg) {
+    localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(cfg));
+  }
+
+  let isFirebaseReady = false;
+  function initFirebaseApp() {
+    if (typeof firebase === "undefined") {
+      console.warn("Firebase SDK not loaded yet.");
+      return false;
+    }
+    const config = getActiveFirebaseConfig();
+    if (!config) return false;
+
+    try {
+      if (!firebase.apps || !firebase.apps.length) {
+        firebase.initializeApp(config);
+        try {
+          firebase.firestore().enablePersistence({ synchronizeTabs: true }).catch(() => {});
+        } catch (e) {}
+      }
+      isFirebaseReady = true;
+      return true;
+    } catch (err) {
+      console.error("Firebase init error:", err);
+      return false;
+    }
+  }
+
+  // ---------- Local Storage ----------
   function loadLocalData() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -42,10 +72,15 @@ import {
 
   function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-    if (state.currentUser) {
-      saveUserCloudData(state.currentUser.uid, state.data).catch((err) => {
-        console.warn("Cloud save error (offline or rules):", err);
-      });
+    if (state.currentUser && typeof firebase !== "undefined" && firebase.apps && firebase.apps.length) {
+      try {
+        const userDoc = firebase.firestore().collection("users").doc(state.currentUser.uid);
+        userDoc.set({ ...state.data, lastSyncedAt: Date.now() }, { merge: true }).catch((err) => {
+          console.warn("Firestore save error:", err);
+        });
+      } catch (e) {
+        console.warn("Firestore write error:", e);
+      }
     }
   }
 
@@ -120,10 +155,11 @@ import {
 
   // ---------- Helpers ----------
   function toast(msg) {
+    if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.classList.add("show");
     clearTimeout(toast._t);
-    toast._t = setTimeout(() => toastEl.classList.remove("show"), 2000);
+    toast._t = setTimeout(() => toastEl.classList.remove("show"), 2200);
   }
 
   function escapeHtml(str) {
@@ -148,7 +184,7 @@ import {
   }
 
   function getFile(id) {
-    return state.data.files.find((f) => f.id === id);
+    return (state.data.files || []).find((f) => f.id === id);
   }
 
   // ---------- Rendering ----------
@@ -171,7 +207,7 @@ import {
     if (q) {
       files = files.filter((f) => f.name.toLowerCase().includes(q));
     }
-    files = [...files].sort((a, b) => b.updatedAt - a.updatedAt);
+    files = [...files].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
     if (files.length === 0) {
       mainView.innerHTML = `
@@ -235,7 +271,7 @@ import {
     if (q) {
       links = links.filter((l) => l.name.toLowerCase().includes(q) || l.url.toLowerCase().includes(q));
     }
-    links = [...links].sort((a, b) => b.createdAt - a.createdAt);
+    links = [...links].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
     if (links.length === 0) {
       mainView.innerHTML = `
@@ -251,17 +287,26 @@ import {
     mainView.innerHTML = links.map(linkRowHtml).join("");
 
     links.forEach((l) => {
-      document.getElementById("open-" + l.id).addEventListener("click", () => {
-        window.open(l.url, "_blank", "noopener,noreferrer");
-      });
-      document.getElementById("edit-" + l.id).addEventListener("click", (e) => {
-        e.stopPropagation();
-        openLinkSheet(l.id);
-      });
-      document.getElementById("del-" + l.id).addEventListener("click", (e) => {
-        e.stopPropagation();
-        askDeleteLink(l.id);
-      });
+      const openEl = document.getElementById("open-" + l.id);
+      if (openEl) {
+        openEl.addEventListener("click", () => {
+          window.open(l.url, "_blank", "noopener,noreferrer");
+        });
+      }
+      const editEl = document.getElementById("edit-" + l.id);
+      if (editEl) {
+        editEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openLinkSheet(l.id);
+        });
+      }
+      const delEl = document.getElementById("del-" + l.id);
+      if (delEl) {
+        delEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          askDeleteLink(l.id);
+        });
+      }
     });
   }
 
@@ -316,7 +361,7 @@ import {
     else openLinkSheet(null);
   });
 
-  // ---------- File sheet (No color selector) ----------
+  // ---------- File sheet ----------
   function openFileSheet(id) {
     state.editingFileId = id;
     if (id) {
@@ -345,9 +390,11 @@ import {
     const now = Date.now();
     if (state.editingFileId) {
       const f = getFile(state.editingFileId);
-      f.name = name;
-      f.updatedAt = now;
-      toast("File renamed");
+      if (f) {
+        f.name = name;
+        f.updatedAt = now;
+        toast("File renamed");
+      }
     } else {
       if (!state.data.files) state.data.files = [];
       state.data.files.push({
@@ -366,6 +413,7 @@ import {
 
   function askDeleteFile(id) {
     const f = getFile(id);
+    if (!f) return;
     state.pendingDelete = { type: "file", id };
     confirmTitle.textContent = `Delete "${f.name}"?`;
     confirmBody.textContent = `This removes the file and all ${(f.links || []).length} link(s) stored in it. This cannot be undone.`;
@@ -376,11 +424,11 @@ import {
   function openLinkSheet(id) {
     state.editingLinkId = id;
     const f = getFile(state.currentFileId);
-    if (id) {
-      const l = f.links.find((x) => x.id === id);
+    if (id && f) {
+      const l = (f.links || []).find((x) => x.id === id);
       linkSheetTitle.textContent = "Edit Link";
-      linkNameInput.value = l.name;
-      linkUrlInput.value = l.url;
+      linkNameInput.value = l ? l.name : "";
+      linkUrlInput.value = l ? l.url : "";
     } else {
       linkSheetTitle.textContent = "New Link";
       linkNameInput.value = "";
@@ -405,12 +453,15 @@ import {
     if (!rawUrl) { toast("Paste the link"); return; }
     const url = normalizeUrl(rawUrl);
     const f = getFile(state.currentFileId);
+    if (!f) return;
     const now = Date.now();
     if (state.editingLinkId) {
-      const l = f.links.find((x) => x.id === state.editingLinkId);
-      l.name = name;
-      l.url = url;
-      toast("Link updated");
+      const l = (f.links || []).find((x) => x.id === state.editingLinkId);
+      if (l) {
+        l.name = name;
+        l.url = url;
+        toast("Link updated");
+      }
     } else {
       if (!f.links) f.links = [];
       f.links.push({ id: uid(), name, url, createdAt: now });
@@ -424,7 +475,9 @@ import {
 
   function askDeleteLink(id) {
     const f = getFile(state.currentFileId);
-    const l = f.links.find((x) => x.id === id);
+    if (!f) return;
+    const l = (f.links || []).find((x) => x.id === id);
+    if (!l) return;
     state.pendingDelete = { type: "link", id };
     confirmTitle.textContent = `Delete "${l.name}"?`;
     confirmBody.textContent = "This cannot be undone.";
@@ -444,13 +497,15 @@ import {
     const pd = state.pendingDelete;
     if (!pd) return;
     if (pd.type === "file") {
-      state.data.files = state.data.files.filter((f) => f.id !== pd.id);
+      state.data.files = (state.data.files || []).filter((f) => f.id !== pd.id);
       toast("File deleted");
     } else if (pd.type === "link") {
       const f = getFile(state.currentFileId);
-      f.links = f.links.filter((l) => l.id !== pd.id);
-      f.updatedAt = Date.now();
-      toast("Link deleted");
+      if (f) {
+        f.links = (f.links || []).filter((l) => l.id !== pd.id);
+        f.updatedAt = Date.now();
+        toast("Link deleted");
+      }
     }
     saveData();
     state.pendingDelete = null;
@@ -462,94 +517,122 @@ import {
   function updateAuthUI(user) {
     state.currentUser = user;
     if (user) {
-      authBtnIcon.style.display = "none";
+      if (authBtnIcon) authBtnIcon.style.display = "none";
       if (user.photoURL) {
-        authBtnAvatar.src = user.photoURL;
-        authBtnAvatar.style.display = "inline-block";
-        userAvatar.src = user.photoURL;
-        userAvatar.style.display = "block";
+        if (authBtnAvatar) {
+          authBtnAvatar.src = user.photoURL;
+          authBtnAvatar.style.display = "inline-block";
+        }
+        if (userAvatar) {
+          userAvatar.src = user.photoURL;
+          userAvatar.style.display = "block";
+        }
       } else {
-        authBtnIcon.style.display = "inline-block";
-        authBtnAvatar.style.display = "none";
-        userAvatar.style.display = "none";
+        if (authBtnIcon) authBtnIcon.style.display = "inline-block";
+        if (authBtnAvatar) authBtnAvatar.style.display = "none";
+        if (userAvatar) userAvatar.style.display = "none";
       }
-      userName.textContent = user.displayName || "Google User";
-      userEmail.textContent = user.email || "";
-      accountLoggedOutView.style.display = "none";
-      accountLoggedInView.style.display = "block";
+      if (userName) userName.textContent = user.displayName || "Google User";
+      if (userEmail) userEmail.textContent = user.email || "";
+      if (accountLoggedOutView) accountLoggedOutView.style.display = "none";
+      if (accountLoggedInView) accountLoggedInView.style.display = "block";
     } else {
-      authBtnIcon.style.display = "inline-block";
-      authBtnAvatar.style.display = "none";
-      accountLoggedOutView.style.display = "block";
-      accountLoggedInView.style.display = "none";
+      if (authBtnIcon) authBtnIcon.style.display = "inline-block";
+      if (authBtnAvatar) authBtnAvatar.style.display = "none";
+      if (accountLoggedOutView) accountLoggedOutView.style.display = "block";
+      if (accountLoggedInView) accountLoggedInView.style.display = "none";
     }
   }
 
-  authBtn.addEventListener("click", () => {
-    accountOverlay.classList.remove("hidden");
-  });
+  if (authBtn) {
+    authBtn.addEventListener("click", () => {
+      accountOverlay.classList.remove("hidden");
+    });
+  }
 
-  accountCloseBtn.addEventListener("click", () => {
-    accountOverlay.classList.add("hidden");
-  });
+  if (accountCloseBtn) {
+    accountCloseBtn.addEventListener("click", () => {
+      accountOverlay.classList.add("hidden");
+    });
+  }
 
-  accountOverlay.addEventListener("click", (e) => {
-    if (e.target === accountOverlay) accountOverlay.classList.add("hidden");
-  });
+  if (accountOverlay) {
+    accountOverlay.addEventListener("click", (e) => {
+      if (e.target === accountOverlay) accountOverlay.classList.add("hidden");
+    });
+  }
 
-  googleSignInBtn.addEventListener("click", async () => {
-    try {
+  if (googleSignInBtn) {
+    googleSignInBtn.addEventListener("click", async () => {
       const config = getActiveFirebaseConfig();
       if (!config) {
         accountOverlay.classList.add("hidden");
         openFirebaseConfigModal();
         return;
       }
-      toast("Signing in with Google...");
-      const result = await loginWithGoogle();
-      if (result && result.user) {
-        toast(`Welcome, ${result.user.displayName || "User"}!`);
-        accountOverlay.classList.add("hidden");
-      }
-    } catch (err) {
-      console.error("Login failed:", err);
-      if (err.code === "auth/unauthorized-domain") {
-        alert("Firebase Auth Domain error: Please add your domain (localhost or your Netlify domain) to Authorized Domains in Firebase Console (Authentication -> Settings -> Authorized Domains).");
-      } else if (err.message && err.message.includes("not configured")) {
-        accountOverlay.classList.add("hidden");
+
+      if (!initFirebaseApp()) {
+        toast("Firebase error. Please check your project settings.");
         openFirebaseConfigModal();
-      } else {
-        toast("Sign in failed: " + (err.message || "Unknown error"));
+        return;
       }
-    }
-  });
 
-  signOutBtn.addEventListener("click", async () => {
-    try {
-      if (state.unsubscribeCloud) {
-        state.unsubscribeCloud();
-        state.unsubscribeCloud = null;
+      toast("Opening Google Sign-In...");
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        if (result && result.user) {
+          toast(`Welcome, ${result.user.displayName || "Google User"}!`);
+          accountOverlay.classList.add("hidden");
+        }
+      } catch (err) {
+        console.error("Sign-in error:", err);
+        if (err.code === "auth/unauthorized-domain") {
+          alert(`Unauthorized Domain Error:\n\nPlease add "${window.location.hostname}" to Authorized Domains in Firebase Console:\nAuthentication -> Settings -> Authorized Domains.`);
+        } else if (err.code === "auth/popup-blocked") {
+          firebase.auth().signInWithRedirect(provider);
+        } else if (err.code !== "auth/popup-closed-by-user") {
+          alert("Sign In Error: " + err.message);
+        }
       }
-      await logoutUser();
-      updateAuthUI(null);
-      state.data = loadLocalData();
-      render();
-      accountOverlay.classList.add("hidden");
-      toast("Signed out successfully");
-    } catch (err) {
-      console.error("Sign out error:", err);
-    }
-  });
+    });
+  }
 
-  syncLocalToCloudBtn.addEventListener("click", async () => {
-    if (!state.currentUser) return;
-    try {
-      await saveUserCloudData(state.currentUser.uid, state.data);
-      toast("Local files synced to Google Cloud!");
-    } catch (err) {
-      toast("Sync failed: " + err.message);
-    }
-  });
+  if (signOutBtn) {
+    signOutBtn.addEventListener("click", async () => {
+      try {
+        if (state.unsubscribeCloud) {
+          state.unsubscribeCloud();
+          state.unsubscribeCloud = null;
+        }
+        if (typeof firebase !== "undefined" && firebase.auth) {
+          await firebase.auth().signOut();
+        }
+        updateAuthUI(null);
+        state.data = loadLocalData();
+        render();
+        accountOverlay.classList.add("hidden");
+        toast("Signed out successfully");
+      } catch (err) {
+        console.error("Sign out error:", err);
+      }
+    });
+  }
+
+  if (syncLocalToCloudBtn) {
+    syncLocalToCloudBtn.addEventListener("click", async () => {
+      if (!state.currentUser || typeof firebase === "undefined") return;
+      try {
+        const userDoc = firebase.firestore().collection("users").doc(state.currentUser.uid);
+        await userDoc.set({ ...state.data, lastSyncedAt: Date.now() }, { merge: true });
+        toast("Local files synced to Google Cloud!");
+      } catch (err) {
+        alert("Sync failed: " + err.message);
+      }
+    });
+  }
 
   // ---------- Firebase Setup Modal ----------
   function openFirebaseConfigModal() {
@@ -562,71 +645,96 @@ import {
     firebaseConfigOverlay.classList.remove("hidden");
   }
 
-  openFirebaseConfigBtn.addEventListener("click", () => {
-    accountOverlay.classList.add("hidden");
-    openFirebaseConfigModal();
-  });
+  if (openFirebaseConfigBtn) {
+    openFirebaseConfigBtn.addEventListener("click", () => {
+      accountOverlay.classList.add("hidden");
+      openFirebaseConfigModal();
+    });
+  }
 
-  firebaseConfigCancelBtn.addEventListener("click", () => {
-    firebaseConfigOverlay.classList.add("hidden");
-  });
-
-  firebaseConfigOverlay.addEventListener("click", (e) => {
-    if (e.target === firebaseConfigOverlay) firebaseConfigOverlay.classList.add("hidden");
-  });
-
-  firebaseConfigSaveBtn.addEventListener("click", () => {
-    const raw = firebaseConfigInput.value.trim();
-    if (!raw) {
-      toast("Paste your Firebase config object");
-      return;
-    }
-    try {
-      // Handle either pure JSON or js object assignment (e.g. const firebaseConfig = { ... })
-      let cleanJson = raw;
-      if (cleanJson.includes("firebaseConfig =")) {
-        cleanJson = cleanJson.split("firebaseConfig =")[1].replace(/;$/, "").trim();
-      }
-      // If keys aren't quoted, convert JS object syntax to JSON
-      cleanJson = cleanJson.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":').replace(/'/g, '"');
-      const parsed = JSON.parse(cleanJson);
-      if (!parsed.apiKey || !parsed.projectId) {
-        throw new Error("Missing apiKey or projectId in configuration.");
-      }
-      saveFirebaseConfig(parsed);
-      initFirebase();
+  if (firebaseConfigCancelBtn) {
+    firebaseConfigCancelBtn.addEventListener("click", () => {
       firebaseConfigOverlay.classList.add("hidden");
-      toast("Firebase configured! You can now sign in.");
-      setTimeout(() => accountOverlay.classList.remove("hidden"), 300);
-    } catch (e) {
-      alert("Invalid configuration: Please paste a valid Firebase configuration object.\n\nError: " + e.message);
-    }
-  });
+    });
+  }
 
-  // Setup Auth Listener
-  try {
-    initFirebase();
-    listenToAuth((user, initialized) => {
-      if (initialized) {
-        updateAuthUI(user);
-        if (user) {
-          // Subscribe to real-time cloud data
-          if (state.unsubscribeCloud) state.unsubscribeCloud();
-          state.unsubscribeCloud = subscribeToUserCloudData(user.uid, (cloudData) => {
-            if (cloudData && cloudData.files && cloudData.files.length > 0) {
-              state.data = cloudData;
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData));
-              render();
-            } else if (state.data.files && state.data.files.length > 0) {
-              // Automatically sync initial local files to newly connected Google account
-              saveUserCloudData(user.uid, state.data);
-            }
-          });
+  if (firebaseConfigOverlay) {
+    firebaseConfigOverlay.addEventListener("click", (e) => {
+      if (e.target === firebaseConfigOverlay) firebaseConfigOverlay.classList.add("hidden");
+    });
+  }
+
+  if (firebaseConfigSaveBtn) {
+    firebaseConfigSaveBtn.addEventListener("click", () => {
+      const raw = firebaseConfigInput.value.trim();
+      if (!raw) {
+        toast("Please paste your Firebase configuration");
+        return;
+      }
+      try {
+        let cleanJson = raw;
+        if (cleanJson.includes("firebaseConfig =")) {
+          cleanJson = cleanJson.split("firebaseConfig =")[1].replace(/;$/, "").trim();
         }
+        cleanJson = cleanJson.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":').replace(/'/g, '"');
+        const parsed = JSON.parse(cleanJson);
+        if (!parsed.apiKey || !parsed.projectId) {
+          throw new Error("Missing apiKey or projectId in configuration.");
+        }
+        saveFirebaseConfig(parsed);
+        initFirebaseApp();
+        setupAuthStateListener();
+        firebaseConfigOverlay.classList.add("hidden");
+        toast("Firebase configured! You can now sign in.");
+        setTimeout(() => accountOverlay.classList.remove("hidden"), 300);
+      } catch (e) {
+        alert("Invalid configuration: Please paste a valid Firebase configuration object.\n\nError: " + e.message);
       }
     });
-  } catch (e) {
-    console.warn("Auth initialization notice:", e);
+  }
+
+  // ---------- Setup Auth State Listener ----------
+  function setupAuthStateListener() {
+    if (typeof firebase === "undefined") return;
+    if (!firebase.apps || !firebase.apps.length) {
+      if (!initFirebaseApp()) return;
+    }
+
+    try {
+      firebase.auth().onAuthStateChanged((user) => {
+        updateAuthUI(user);
+        if (user) {
+          if (state.unsubscribeCloud) state.unsubscribeCloud();
+          const userDoc = firebase.firestore().collection("users").doc(user.uid);
+          state.unsubscribeCloud = userDoc.onSnapshot(
+            (docSnap) => {
+              if (docSnap.exists) {
+                const data = docSnap.data();
+                if (data && Array.isArray(data.files)) {
+                  state.data = data;
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                  render();
+                }
+              } else {
+                if (state.data.files && state.data.files.length > 0) {
+                  userDoc.set({ ...state.data, lastSyncedAt: Date.now() }, { merge: true }).catch(() => {});
+                }
+              }
+            },
+            (err) => {
+              console.warn("Firestore sync notification:", err);
+            }
+          );
+        }
+      });
+    } catch (e) {
+      console.warn("Auth listener setup notice:", e);
+    }
+  }
+
+  // Initialize Firebase if config exists
+  if (initFirebaseApp()) {
+    setupAuthStateListener();
   }
 
   // ---------- Standalone PWA Installation ----------
@@ -702,7 +810,7 @@ import {
           console.log("Service Worker registered successfully:", reg.scope);
         })
         .catch((err) => {
-          console.warn("Service Worker registration failed:", err);
+          console.warn("Service Worker registration notice:", err);
         });
     };
 

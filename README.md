@@ -28,10 +28,9 @@ Plain HTML, CSS, and JavaScript with modular Firebase Web SDKs (CDN) — no buil
 |---|---|
 | `index.html` | App shell, modals & markup |
 | `style.css` | Notepad theme, auth UI, layout, responsive rules |
-| `app.js` | State management, rendering, CRUD, auth UI, real-time sync & PWA installation |
-| `firebase-config.js` | Firebase App, Google Auth & Cloud Firestore sync module |
+| `app.js` | State management, rendering, CRUD, Google Auth, real-time sync & PWA installation |
 | `manifest.json` | PWA metadata — app id, standalone display mode, display override, icons |
-| `service-worker.js` | Caches app assets for offline use (v8) |
+| `service-worker.js` | Caches app assets for offline use (v9) |
 | `_headers` | Netlify headers for manifest and service worker |
 | `icon-192.png` | 192px app icon |
 | `icon-512.png` | 512px app icon |
@@ -52,8 +51,8 @@ To enable Google Sign-In and access your links on any device:
    - Register your app (e.g. "LinkVault Web").
    - Copy the `firebaseConfig` object (with `apiKey`, `projectId`, etc.).
 4. In LinkVault:
-   - Either paste the keys into `firebase-config.js` (inside `DEFAULT_FIREBASE_CONFIG`), OR
-   - Open LinkVault in your browser, tap the **Account (👤)** icon -> **⚙️ Configure Firebase Project Keys** -> paste the config and save!
+   - Open LinkVault in your browser, tap the **Account (👤)** icon -> **Sign In with Google** (or **⚙️ Configure Firebase Project Keys**).
+   - Paste the config object and click **Save & Connect**!
 5. In Firebase Console (**Authentication** -> **Settings** -> **Authorized domains**):
    - Add your Netlify domain (e.g. `your-site.netlify.app`) and `localhost`.
 
@@ -93,7 +92,6 @@ linkvault/
 ├── index.html
 ├── style.css
 ├── app.js
-├── firebase-config.js
 ├── manifest.json
 ├── service-worker.js
 ├── _headers
