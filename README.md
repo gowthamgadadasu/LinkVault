@@ -8,31 +8,56 @@ LinkVault is a personal alternative to browser bookmarks: a clean vault app wher
 
 ## Features
 
+- 🌐 **Google Account & Multi-Device Sync** — sign in with your Google email to access and sync your files and links automatically across all your phones, laptops, and tablets
 - 📁 **Files for your links** — create files to group related links together (e.g. "React Tutorials", "Interview Prep", "Design Systems") without clutter
 - 🔗 **Name-your-own links** — every saved link is stored under a name you choose; tapping that name opens the real URL in a new tab
 - 📲 **Installable Standalone App** — modern PWA with `manifest.json` and service worker, installable directly as a native desktop or mobile application (not a simple Chrome shortcut)
-- 📴 **Fully offline** — a service worker caches the whole app shell, so it works with no internet connection after the first load
+- 📴 **Fully offline** — a service worker caches the whole app shell and Firestore provides offline persistence, so it works with no internet connection
 - ✏️ **Full CRUD** — create, rename, or delete files and links, with a confirmation step before anything is removed
 - 🔍 **Search** — filter files or the links inside a file by name
 - ✍️ **Notepad-style UI** — ruled-paper background, serif typography, minimal and distraction-free
-- 🔒 **Private by design** — all data is stored locally on your device (`localStorage`); nothing is sent to an external server
+- 🔒 **Private by design** — guest data lives locally on your device (`localStorage`); signed-in data is stored in your private Firebase Firestore database
 
 ---
 
 ## Tech stack
 
-Plain HTML, CSS, and JavaScript — no framework, no build step, no dependencies.
+Plain HTML, CSS, and JavaScript with modular Firebase Web SDKs (CDN) — no build tools or package manager needed.
 
 | File | Purpose |
 |---|---|
-| `index.html` | App shell / markup |
-| `style.css` | Notepad-style theme, layout, responsive rules |
-| `app.js` | State management, rendering, file/link CRUD, standalone PWA install prompt & lifecycle, service worker registration |
-| `manifest.json` | PWA metadata — app id, standalone display mode, display override, icons, theme colors |
-| `service-worker.js` | Caches app assets for offline use (v7) |
+| `index.html` | App shell, modals & markup |
+| `style.css` | Notepad theme, auth UI, layout, responsive rules |
+| `app.js` | State management, rendering, CRUD, auth UI, real-time sync & PWA installation |
+| `firebase-config.js` | Firebase App, Google Auth & Cloud Firestore sync module |
+| `manifest.json` | PWA metadata — app id, standalone display mode, display override, icons |
+| `service-worker.js` | Caches app assets for offline use (v8) |
+| `_headers` | Netlify headers for manifest and service worker |
 | `icon-192.png` | 192px app icon |
 | `icon-512.png` | 512px app icon |
 | `icon-maskable-512.png` | 512px maskable adaptive app icon |
+
+---
+
+## Google Sign-In & Multi-Device Sync Setup
+
+To enable Google Sign-In and access your links on any device:
+
+1. Go to the [Firebase Console](https://console.firebase.google.com) and create a **Free** project (e.g. `LinkVault`).
+2. In your Firebase project dashboard:
+   - Go to **Build** -> **Authentication** -> **Get Started**.
+   - Under the **Sign-in method** tab, enable **Google**. Set your support email and click **Save**.
+   - Go to **Build** -> **Firestore Database** -> **Create database** -> Choose **Start in production mode** (or test mode).
+3. Under **Project Settings (⚙️)** -> **General** -> scroll down to **Your apps** -> click the **Web (</>)** icon:
+   - Register your app (e.g. "LinkVault Web").
+   - Copy the `firebaseConfig` object (with `apiKey`, `projectId`, etc.).
+4. In LinkVault:
+   - Either paste the keys into `firebase-config.js` (inside `DEFAULT_FIREBASE_CONFIG`), OR
+   - Open LinkVault in your browser, tap the **Account (👤)** icon -> **⚙️ Configure Firebase Project Keys** -> paste the config and save!
+5. In Firebase Console (**Authentication** -> **Settings** -> **Authorized domains**):
+   - Add your Netlify domain (e.g. `your-site.netlify.app`) and `localhost`.
+
+Now you can sign in with your Google email on any device and all your links will stay synchronized in real time!
 
 ---
 
@@ -68,6 +93,7 @@ linkvault/
 ├── index.html
 ├── style.css
 ├── app.js
+├── firebase-config.js
 ├── manifest.json
 ├── service-worker.js
 ├── _headers

@@ -1,10 +1,21 @@
+import {
+  initFirebase,
+  getActiveFirebaseConfig,
+  saveFirebaseConfig,
+  loginWithGoogle,
+  logoutUser,
+  listenToAuth,
+  subscribeToUserCloudData,
+  saveUserCloudData
+} from "./firebase-config.js";
+
 (() => {
   "use strict";
 
   const STORAGE_KEY = "linkvault.data.v1";
 
   // ---------- Storage ----------
-  function loadData() {
+  function loadLocalData() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -31,6 +42,11 @@
 
   function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+    if (state.currentUser) {
+      saveUserCloudData(state.currentUser.uid, state.data).catch((err) => {
+        console.warn("Cloud save error (offline or rules):", err);
+      });
+    }
   }
 
   function uid() {
@@ -39,13 +55,15 @@
 
   // ---------- State ----------
   const state = {
-    data: loadData(),
+    data: loadLocalData(),
     view: "files",      // "files" | "links"
     currentFileId: null,
     searchQuery: "",
     editingFileId: null,   // set when file sheet is in edit mode
     editingLinkId: null,   // set when link sheet is in edit mode
     pendingDelete: null,   // { type: 'file'|'link', id }
+    currentUser: null,     // Firebase User object
+    unsubscribeCloud: null
   };
 
   // ---------- DOM refs ----------
@@ -58,6 +76,26 @@
   const searchWrap = $("searchWrap");
   const searchInput = $("searchInput");
   const installTopBtn = $("installTopBtn");
+
+  const authBtn = $("authBtn");
+  const authBtnIcon = $("authBtnIcon");
+  const authBtnAvatar = $("authBtnAvatar");
+  const accountOverlay = $("accountOverlay");
+  const accountCloseBtn = $("accountCloseBtn");
+  const accountLoggedOutView = $("accountLoggedOutView");
+  const accountLoggedInView = $("accountLoggedInView");
+  const googleSignInBtn = $("googleSignInBtn");
+  const signOutBtn = $("signOutBtn");
+  const syncLocalToCloudBtn = $("syncLocalToCloudBtn");
+  const userAvatar = $("userAvatar");
+  const userName = $("userName");
+  const userEmail = $("userEmail");
+
+  const openFirebaseConfigBtn = $("openFirebaseConfigBtn");
+  const firebaseConfigOverlay = $("firebaseConfigOverlay");
+  const firebaseConfigInput = $("firebaseConfigInput");
+  const firebaseConfigSaveBtn = $("firebaseConfigSaveBtn");
+  const firebaseConfigCancelBtn = $("firebaseConfigCancelBtn");
 
   const fileOverlay = $("fileOverlay");
   const fileSheetTitle = $("fileSheetTitle");
@@ -85,7 +123,7 @@
     toastEl.textContent = msg;
     toastEl.classList.add("show");
     clearTimeout(toast._t);
-    toast._t = setTimeout(() => toastEl.classList.remove("show"), 1800);
+    toast._t = setTimeout(() => toastEl.classList.remove("show"), 2000);
   }
 
   function escapeHtml(str) {
@@ -128,7 +166,7 @@
     fabBtn.setAttribute("aria-label", "New file");
     fabBtn.title = "Create new file";
 
-    let files = state.data.files;
+    let files = state.data.files || [];
     const q = state.searchQuery.trim().toLowerCase();
     if (q) {
       files = files.filter((f) => f.name.toLowerCase().includes(q));
@@ -139,7 +177,7 @@
       mainView.innerHTML = `
         <div class="empty-state">
           <span class="glyph">&#128193;</span>
-          <p>${state.data.files.length === 0
+          <p>${(state.data.files || []).length === 0
               ? "No files yet. Tap + to create a file — like \u201cReact Tutorials\u201d or \u201cInterview Prep\u201d — and save related links inside it."
               : "No files match your search."}</p>
         </div>`;
@@ -150,6 +188,7 @@
 
     files.forEach((f) => {
       const card = document.getElementById("file-" + f.id);
+      if (!card) return;
       card.addEventListener("click", () => openFile(f.id));
       let pressTimer;
       card.addEventListener("touchstart", () => { pressTimer = setTimeout(() => openFileMenu(f.id), 500); });
@@ -159,7 +198,7 @@
   }
 
   function fileCardHtml(f) {
-    const count = f.links.length;
+    const count = (f.links || []).length;
     return `
       <div class="file-card" id="file-${f.id}">
         <div class="file-header">
@@ -167,7 +206,7 @@
           <span class="file-tag">${count} link${count === 1 ? "" : "s"}</span>
         </div>
         <div class="file-name">${escapeHtml(f.name)}</div>
-        <div class="file-meta">Updated ${formatDate(f.updatedAt)}</div>
+        <div class="file-meta">Updated ${formatDate(f.updatedAt || Date.now())}</div>
       </div>`;
   }
 
@@ -191,7 +230,7 @@
     fabBtn.setAttribute("aria-label", "New link");
     fabBtn.title = "Save new link";
 
-    let links = f.links;
+    let links = f.links || [];
     const q = state.searchQuery.trim().toLowerCase();
     if (q) {
       links = links.filter((l) => l.name.toLowerCase().includes(q) || l.url.toLowerCase().includes(q));
@@ -202,7 +241,7 @@
       mainView.innerHTML = `
         <div class="empty-state">
           <span class="glyph">&#128279;</span>
-          <p>${f.links.length === 0
+          <p>${(f.links || []).length === 0
               ? "This file is empty. Tap + to save your first link inside this file."
               : "No links match your search."}</p>
         </div>`;
@@ -310,6 +349,7 @@
       f.updatedAt = now;
       toast("File renamed");
     } else {
+      if (!state.data.files) state.data.files = [];
       state.data.files.push({
         id: uid(),
         name,
@@ -328,7 +368,7 @@
     const f = getFile(id);
     state.pendingDelete = { type: "file", id };
     confirmTitle.textContent = `Delete "${f.name}"?`;
-    confirmBody.textContent = `This removes the file and all ${f.links.length} link(s) stored in it. This cannot be undone.`;
+    confirmBody.textContent = `This removes the file and all ${(f.links || []).length} link(s) stored in it. This cannot be undone.`;
     confirmOverlay.classList.remove("hidden");
   }
 
@@ -372,6 +412,7 @@
       l.url = url;
       toast("Link updated");
     } else {
+      if (!f.links) f.links = [];
       f.links.push({ id: uid(), name, url, createdAt: now });
       toast("Link saved");
     }
@@ -417,12 +458,182 @@
     render();
   });
 
+  // ---------- Google Account & Cloud Sync ----------
+  function updateAuthUI(user) {
+    state.currentUser = user;
+    if (user) {
+      authBtnIcon.style.display = "none";
+      if (user.photoURL) {
+        authBtnAvatar.src = user.photoURL;
+        authBtnAvatar.style.display = "inline-block";
+        userAvatar.src = user.photoURL;
+        userAvatar.style.display = "block";
+      } else {
+        authBtnIcon.style.display = "inline-block";
+        authBtnAvatar.style.display = "none";
+        userAvatar.style.display = "none";
+      }
+      userName.textContent = user.displayName || "Google User";
+      userEmail.textContent = user.email || "";
+      accountLoggedOutView.style.display = "none";
+      accountLoggedInView.style.display = "block";
+    } else {
+      authBtnIcon.style.display = "inline-block";
+      authBtnAvatar.style.display = "none";
+      accountLoggedOutView.style.display = "block";
+      accountLoggedInView.style.display = "none";
+    }
+  }
+
+  authBtn.addEventListener("click", () => {
+    accountOverlay.classList.remove("hidden");
+  });
+
+  accountCloseBtn.addEventListener("click", () => {
+    accountOverlay.classList.add("hidden");
+  });
+
+  accountOverlay.addEventListener("click", (e) => {
+    if (e.target === accountOverlay) accountOverlay.classList.add("hidden");
+  });
+
+  googleSignInBtn.addEventListener("click", async () => {
+    try {
+      const config = getActiveFirebaseConfig();
+      if (!config) {
+        accountOverlay.classList.add("hidden");
+        openFirebaseConfigModal();
+        return;
+      }
+      toast("Signing in with Google...");
+      const result = await loginWithGoogle();
+      if (result && result.user) {
+        toast(`Welcome, ${result.user.displayName || "User"}!`);
+        accountOverlay.classList.add("hidden");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      if (err.code === "auth/unauthorized-domain") {
+        alert("Firebase Auth Domain error: Please add your domain (localhost or your Netlify domain) to Authorized Domains in Firebase Console (Authentication -> Settings -> Authorized Domains).");
+      } else if (err.message && err.message.includes("not configured")) {
+        accountOverlay.classList.add("hidden");
+        openFirebaseConfigModal();
+      } else {
+        toast("Sign in failed: " + (err.message || "Unknown error"));
+      }
+    }
+  });
+
+  signOutBtn.addEventListener("click", async () => {
+    try {
+      if (state.unsubscribeCloud) {
+        state.unsubscribeCloud();
+        state.unsubscribeCloud = null;
+      }
+      await logoutUser();
+      updateAuthUI(null);
+      state.data = loadLocalData();
+      render();
+      accountOverlay.classList.add("hidden");
+      toast("Signed out successfully");
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
+  });
+
+  syncLocalToCloudBtn.addEventListener("click", async () => {
+    if (!state.currentUser) return;
+    try {
+      await saveUserCloudData(state.currentUser.uid, state.data);
+      toast("Local files synced to Google Cloud!");
+    } catch (err) {
+      toast("Sync failed: " + err.message);
+    }
+  });
+
+  // ---------- Firebase Setup Modal ----------
+  function openFirebaseConfigModal() {
+    const config = getActiveFirebaseConfig();
+    if (config) {
+      firebaseConfigInput.value = JSON.stringify(config, null, 2);
+    } else {
+      firebaseConfigInput.value = "";
+    }
+    firebaseConfigOverlay.classList.remove("hidden");
+  }
+
+  openFirebaseConfigBtn.addEventListener("click", () => {
+    accountOverlay.classList.add("hidden");
+    openFirebaseConfigModal();
+  });
+
+  firebaseConfigCancelBtn.addEventListener("click", () => {
+    firebaseConfigOverlay.classList.add("hidden");
+  });
+
+  firebaseConfigOverlay.addEventListener("click", (e) => {
+    if (e.target === firebaseConfigOverlay) firebaseConfigOverlay.classList.add("hidden");
+  });
+
+  firebaseConfigSaveBtn.addEventListener("click", () => {
+    const raw = firebaseConfigInput.value.trim();
+    if (!raw) {
+      toast("Paste your Firebase config object");
+      return;
+    }
+    try {
+      // Handle either pure JSON or js object assignment (e.g. const firebaseConfig = { ... })
+      let cleanJson = raw;
+      if (cleanJson.includes("firebaseConfig =")) {
+        cleanJson = cleanJson.split("firebaseConfig =")[1].replace(/;$/, "").trim();
+      }
+      // If keys aren't quoted, convert JS object syntax to JSON
+      cleanJson = cleanJson.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":').replace(/'/g, '"');
+      const parsed = JSON.parse(cleanJson);
+      if (!parsed.apiKey || !parsed.projectId) {
+        throw new Error("Missing apiKey or projectId in configuration.");
+      }
+      saveFirebaseConfig(parsed);
+      initFirebase();
+      firebaseConfigOverlay.classList.add("hidden");
+      toast("Firebase configured! You can now sign in.");
+      setTimeout(() => accountOverlay.classList.remove("hidden"), 300);
+    } catch (e) {
+      alert("Invalid configuration: Please paste a valid Firebase configuration object.\n\nError: " + e.message);
+    }
+  });
+
+  // Setup Auth Listener
+  try {
+    initFirebase();
+    listenToAuth((user, initialized) => {
+      if (initialized) {
+        updateAuthUI(user);
+        if (user) {
+          // Subscribe to real-time cloud data
+          if (state.unsubscribeCloud) state.unsubscribeCloud();
+          state.unsubscribeCloud = subscribeToUserCloudData(user.uid, (cloudData) => {
+            if (cloudData && cloudData.files && cloudData.files.length > 0) {
+              state.data = cloudData;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData));
+              render();
+            } else if (state.data.files && state.data.files.length > 0) {
+              // Automatically sync initial local files to newly connected Google account
+              saveUserCloudData(user.uid, state.data);
+            }
+          });
+        }
+      }
+    });
+  } catch (e) {
+    console.warn("Auth initialization notice:", e);
+  }
+
   // ---------- Standalone PWA Installation ----------
   let deferredInstallPrompt = null;
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 
   window.addEventListener("beforeinstallprompt", (e) => {
-    // Prevent the default mini-infobar or browser default banner
     e.preventDefault();
     deferredInstallPrompt = e;
 
