@@ -506,17 +506,67 @@ main {
   margin-top: 5px;
 }
 
-#firebaseConfigInput {
+/* Auth divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 18px 0 14px;
+  gap: 10px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--paper-line);
+}
+.auth-divider span {
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+/* Email auth form */
+#emailAuthForm label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 10px 0 4px;
+}
+#emailAuthForm input {
   width: 100%;
-  font-family: monospace;
-  font-size: 12.5px;
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--paper-line);
+  font-family: inherit;
+  font-size: 14px;
   background: #fff;
   color: var(--ink);
-  resize: vertical;
+  box-sizing: border-box;
 }
-#firebaseConfigInput:focus {
+#emailAuthForm input:focus {
   outline: 2px solid var(--gold);
+  border-color: var(--gold);
+}
+
+/* Auth toggle row */
+.auth-toggle-row {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.btn-link-inline {
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+  margin-left: 4px;
 }
