@@ -30,7 +30,7 @@ Plain HTML, CSS, and JavaScript with modular Firebase Web SDKs (CDN) — no buil
 | `style.css` | Notepad theme, auth UI, layout, responsive rules |
 | `app.js` | State management, rendering, CRUD, Google Auth, real-time sync & PWA installation |
 | `manifest.json` | PWA metadata — app id, standalone display mode, display override, icons |
-| `service-worker.js` | Caches app assets for offline use (v9) |
+| `service-worker.js` | Caches app assets for offline use (v11) |
 | `_headers` | Netlify headers for manifest and service worker |
 | `icon-192.png` | 192px app icon |
 | `icon-512.png` | 512px app icon |
@@ -38,25 +38,18 @@ Plain HTML, CSS, and JavaScript with modular Firebase Web SDKs (CDN) — no buil
 
 ---
 
-## Google Sign-In & Multi-Device Sync Setup
+## User Sign-In & Multi-Device Sync
 
-To enable Google Sign-In and access your links on any device:
+Your Firebase project is pre-configured in `app.js`! Users can sign in using either:
+- **1-Click Google Sign-In**
+- **Email & Password** (Sign In or Create an Account)
 
-1. Go to the [Firebase Console](https://console.firebase.google.com) and create a **Free** project (e.g. `LinkVault`).
-2. In your Firebase project dashboard:
-   - Go to **Build** -> **Authentication** -> **Get Started**.
-   - Under the **Sign-in method** tab, enable **Google**. Set your support email and click **Save**.
-   - Go to **Build** -> **Firestore Database** -> **Create database** -> Choose **Start in production mode** (or test mode).
-3. Under **Project Settings (⚙️)** -> **General** -> scroll down to **Your apps** -> click the **Web (</>)** icon:
-   - Register your app (e.g. "LinkVault Web").
-   - Copy the `firebaseConfig` object (with `apiKey`, `projectId`, etc.).
-4. In LinkVault:
-   - Open LinkVault in your browser, tap the **Account (👤)** icon -> **Sign In with Google** (or **⚙️ Configure Firebase Project Keys**).
-   - Paste the config object and click **Save & Connect**!
-5. In Firebase Console (**Authentication** -> **Settings** -> **Authorized domains**):
-   - Add your Netlify domain (e.g. `your-site.netlify.app`) and `localhost`.
+To log in:
+1. Tap the **Account (👤)** icon in the top right.
+2. Either tap **Continue with Google**, or enter your email and password.
+3. All your files and links will now sync in real time across any phone, laptop, or tablet you log into!
 
-Now you can sign in with your Google email on any device and all your links will stay synchronized in real time!
+*Note for Netlify deployments:* Remember to add your Netlify domain (e.g. `your-site.netlify.app`) to **Authorized domains** in the [Firebase Console](https://console.firebase.google.com) (under **Authentication** -> **Settings** -> **Authorized domains**). Also ensure **Email/Password** is enabled under **Authentication** -> **Sign-in method**.
 
 ---
 

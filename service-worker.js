@@ -1,4 +1,4 @@
-const CACHE_NAME = "linkvault-cache-v10";
+const CACHE_NAME = "linkvault-cache-v14";
 const ASSETS = [
   "./",
   "index.html",

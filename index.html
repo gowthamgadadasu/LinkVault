@@ -51,9 +51,7 @@
       
       <!-- Logged out state -->
       <div id="accountLoggedOutView">
-        <p class="account-desc">Sign in to access and sync all your saved files and links from any phone, laptop, or tablet.</p>
-        
-        <!-- Google 1-Click Sign In -->
+        <p class="account-desc">Sign in to access and sync your files and links from any phone, laptop, or tablet.</p>
         <button class="btn-google" id="googleSignInBtn">
           <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -64,20 +62,19 @@
           <span>Continue with Google</span>
         </button>
 
-        <div class="auth-divider"><span>or sign in with email</span></div>
+        <div class="auth-divider"><span>or with email & password</span></div>
 
-        <!-- Email / Password Form -->
         <form id="emailAuthForm" onsubmit="return false;">
           <label for="authEmailInput">Email address</label>
           <input type="email" id="authEmailInput" placeholder="you@example.com" autocomplete="email" required />
           <label for="authPasswordInput">Password</label>
-          <input type="password" id="authPasswordInput" placeholder="••••••••" autocomplete="current-password" required minlength="6" />
+          <input type="password" id="authPasswordInput" placeholder="Password (minimum 6 characters)" autocomplete="current-password" minlength="6" required />
           <button type="submit" class="btn-primary" id="emailAuthSubmitBtn" style="margin-top:14px; width:100%;">Sign In</button>
         </form>
 
         <div class="auth-toggle-row">
           <span id="authToggleText">Don't have an account?</span>
-          <button class="btn-link-inline" id="authToggleBtn">Create Account</button>
+          <button type="button" class="btn-link-inline" id="authToggleBtn">Create Account</button>
         </div>
       </div>
 
@@ -86,12 +83,12 @@
         <div class="user-profile-box">
           <img id="userAvatar" class="user-avatar-large" alt="User Profile" />
           <div class="user-info">
-            <div class="user-name" id="userName">User</div>
-            <div class="user-email" id="userEmail">user@example.com</div>
-            <div class="sync-badge">☁️ Synced Across Devices</div>
+            <div class="user-name" id="userName">Google User</div>
+            <div class="user-email" id="userEmail">user@gmail.com</div>
+            <div class="sync-badge">☁️ Synced to Google Cloud</div>
           </div>
         </div>
-        <button class="btn-secondary" id="syncLocalToCloudBtn" style="margin-top:12px; width:100%;">Upload Local Files to Cloud</button>
+        <button class="btn-secondary" id="syncLocalToCloudBtn" style="margin-top:12px; width:100%;">Upload Local Files to Account</button>
         <button class="btn-danger" id="signOutBtn" style="margin-top:10px; width:100%;">Sign Out</button>
       </div>
 
@@ -125,6 +122,19 @@
       <div class="sheet-actions">
         <button class="btn-secondary" id="linkCancelBtn">Cancel</button>
         <button class="btn-primary" id="linkSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Item options sheet (Rename / Delete) -->
+  <div class="overlay hidden" id="itemMenuOverlay">
+    <div class="sheet">
+      <h2 id="itemMenuTitle">Options</h2>
+      <p id="itemMenuSubtitle" style="color:var(--ink-soft); font-size:14px; margin-bottom:18px; word-break:break-word;"></p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn-primary" id="itemMenuRenameBtn" style="padding:13px; font-size:15px;">&#9998; Rename</button>
+        <button class="btn-danger" id="itemMenuDeleteBtn" style="padding:13px; font-size:15px;">&#128465; Delete</button>
+        <button class="btn-secondary" id="itemMenuCancelBtn" style="padding:12px; font-size:14px;">Cancel</button>
       </div>
     </div>
   </div>
