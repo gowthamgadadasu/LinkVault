@@ -554,6 +554,13 @@
     render();
   });
 
+  fileNameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      fileSaveBtn.click();
+    }
+  });
+
   function askDeleteFile(id) {
     const f = getFile(id);
     if (!f) return;
@@ -614,6 +621,24 @@
     saveData();
     closeLinkSheet();
     render();
+  });
+
+  linkNameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (linkUrlInput.value.trim()) {
+        linkSaveBtn.click();
+      } else {
+        linkUrlInput.focus();
+      }
+    }
+  });
+
+  linkUrlInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      linkSaveBtn.click();
+    }
   });
 
   function askDeleteLink(id) {
