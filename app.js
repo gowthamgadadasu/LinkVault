@@ -115,10 +115,15 @@
   const accountLoggedInView = $("accountLoggedInView");
   const googleSignInBtn = $("googleSignInBtn");
   const signOutBtn = $("signOutBtn");
+  const deleteAccountBtn = $("deleteAccountBtn");
   const syncLocalToCloudBtn = $("syncLocalToCloudBtn");
   const userAvatar = $("userAvatar");
   const userName = $("userName");
   const userEmail = $("userEmail");
+
+  const deleteAccountConfirmOverlay = $("deleteAccountConfirmOverlay");
+  const deleteAccountCancelBtn = $("deleteAccountCancelBtn");
+  const deleteAccountConfirmBtn = $("deleteAccountConfirmBtn");
 
   const emailAuthForm = $("emailAuthForm");
   const authEmailInput = $("authEmailInput");
@@ -137,8 +142,17 @@
   const linkSheetTitle = $("linkSheetTitle");
   const linkNameInput = $("linkNameInput");
   const linkUrlInput = $("linkUrlInput");
+  const linkDescInput = $("linkDescInput");
   const linkSaveBtn = $("linkSaveBtn");
   const linkCancelBtn = $("linkCancelBtn");
+
+  const linkInfoOverlay = $("linkInfoOverlay");
+  const linkInfoTitle = $("linkInfoTitle");
+  const linkInfoDesc = $("linkInfoDesc");
+  const linkInfoUrl = $("linkInfoUrl");
+  const linkInfoOpenBtn = $("linkInfoOpenBtn");
+  const linkInfoEditBtn = $("linkInfoEditBtn");
+  const linkInfoCloseBtn = $("linkInfoCloseBtn");
 
   const itemMenuOverlay = $("itemMenuOverlay");
   const itemMenuTitle = $("itemMenuTitle");
@@ -188,6 +202,58 @@
   function getFile(id) {
     return (state.data.files || []).find((f) => f.id === id);
   }
+
+  // ---------- Mobile & Browser History Navigation ----------
+  function initHistory() {
+    if (!history.state) {
+      history.replaceState({ view: "files" }, "");
+    }
+  }
+
+  function closeAllOverlays() {
+    const openOverlays = document.querySelectorAll(".overlay:not(.hidden)");
+    let closedAny = false;
+    openOverlays.forEach((el) => {
+      el.classList.add("hidden");
+      closedAny = true;
+    });
+    state.editingFileId = null;
+    state.editingLinkId = null;
+    state.activeMenuItem = null;
+    return closedAny;
+  }
+
+  function pushHistoryOverlay(overlayId) {
+    history.pushState({ overlay: overlayId }, "");
+  }
+
+  window.addEventListener("popstate", (e) => {
+    // 1. If any modal overlay is open, dismiss it first
+    if (closeAllOverlays()) {
+      return;
+    }
+
+    // 2. If search is active, close search
+    if (searchWrap && searchWrap.style.display !== "none") {
+      searchWrap.style.display = "none";
+      searchInput.value = "";
+      state.searchQuery = "";
+      render();
+      return;
+    }
+
+    // 3. Otherwise update view state
+    const s = e.state;
+    if (s && s.view === "links" && s.fileId) {
+      state.currentFileId = s.fileId;
+      state.view = "links";
+      render();
+    } else {
+      state.view = "files";
+      state.currentFileId = null;
+      render();
+    }
+  });
 
   // ---------- Rendering ----------
   function render() {
@@ -309,6 +375,7 @@
       if (itemMenuTitle) itemMenuTitle.textContent = "Link Options";
       if (itemMenuSubtitle) itemMenuSubtitle.textContent = `"${l.name}"`;
     }
+    pushHistoryOverlay("itemMenuOverlay");
     if (itemMenuOverlay) itemMenuOverlay.classList.remove("hidden");
   }
 
@@ -380,10 +447,17 @@
     mainView.innerHTML = links.map(linkRowHtml).join("");
 
     links.forEach((l) => {
-      const row = document.getElementById("link-row-" + l.id);
       const openEl = document.getElementById("open-" + l.id);
+      const infoEl = document.getElementById("info-" + l.id);
       const editEl = document.getElementById("edit-" + l.id);
       const delEl = document.getElementById("del-" + l.id);
+
+      if (infoEl) {
+        infoEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openLinkInfo(l.id);
+        });
+      }
 
       if (editEl) {
         editEl.addEventListener("click", (e) => {
@@ -461,29 +535,37 @@
           <div class="link-url">${escapeHtml(l.url)}</div>
         </div>
         <div class="row-actions">
-          <button id="edit-${l.id}" aria-label="Edit" title="Edit link">&#9998;</button>
-          <button id="del-${l.id}" aria-label="Delete" title="Delete link">&#128465;</button>
+          <button class="info-btn" id="info-${l.id}" aria-label="Link info" title="View details and notes">&#9432;</button>
+          <button class="action-btn" id="edit-${l.id}" aria-label="Edit" title="Edit link">&#9998;</button>
+          <button class="action-btn" id="del-${l.id}" aria-label="Delete" title="Delete link">&#128465;</button>
         </div>
       </div>`;
   }
 
   // ---------- Navigation ----------
-  function openFile(id) {
+  function openFile(id, isPopState = false) {
     state.currentFileId = id;
     state.view = "links";
     state.searchQuery = "";
     searchInput.value = "";
     searchWrap.style.display = "none";
+    if (!isPopState) {
+      history.pushState({ view: "links", fileId: id }, "");
+    }
     render();
   }
 
   backBtn.addEventListener("click", () => {
-    state.view = "files";
-    state.currentFileId = null;
-    state.searchQuery = "";
-    searchInput.value = "";
-    searchWrap.style.display = "none";
-    render();
+    if (history.state && history.state.view === "links") {
+      history.back();
+    } else {
+      state.view = "files";
+      state.currentFileId = null;
+      state.searchQuery = "";
+      searchInput.value = "";
+      searchWrap.style.display = "none";
+      render();
+    }
   });
 
   searchToggle.addEventListener("click", () => {
@@ -504,7 +586,7 @@
     else openLinkSheet(null);
   });
 
-  // ---------- File sheet ----------
+  // ---------- File Sheet ----------
   function openFileSheet(id) {
     state.editingFileId = id;
     if (id) {
@@ -515,6 +597,7 @@
       fileSheetTitle.textContent = "New File";
       fileNameInput.value = "";
     }
+    pushHistoryOverlay("fileOverlay");
     fileOverlay.classList.remove("hidden");
     setTimeout(() => fileNameInput.focus(), 50);
   }
@@ -567,10 +650,11 @@
     state.pendingDelete = { type: "file", id };
     confirmTitle.textContent = `Delete "${f.name}"?`;
     confirmBody.textContent = `This removes the file and all ${(f.links || []).length} link(s) stored in it. This cannot be undone.`;
+    pushHistoryOverlay("confirmOverlay");
     confirmOverlay.classList.remove("hidden");
   }
 
-  // ---------- Link sheet ----------
+  // ---------- Link Sheet ----------
   function openLinkSheet(id) {
     state.editingLinkId = id;
     const f = getFile(state.currentFileId);
@@ -579,11 +663,14 @@
       linkSheetTitle.textContent = "Edit Link";
       linkNameInput.value = l ? l.name : "";
       linkUrlInput.value = l ? l.url : "";
+      if (linkDescInput) linkDescInput.value = l && l.description ? l.description : "";
     } else {
       linkSheetTitle.textContent = "New Link";
       linkNameInput.value = "";
       linkUrlInput.value = "";
+      if (linkDescInput) linkDescInput.value = "";
     }
+    pushHistoryOverlay("linkOverlay");
     linkOverlay.classList.remove("hidden");
     setTimeout(() => linkNameInput.focus(), 50);
   }
@@ -599,6 +686,7 @@
   linkSaveBtn.addEventListener("click", () => {
     const name = linkNameInput.value.trim();
     const rawUrl = linkUrlInput.value.trim();
+    const description = linkDescInput ? linkDescInput.value.trim() : "";
     if (!name) { toast("Give this link a name"); return; }
     if (!rawUrl) { toast("Paste the link"); return; }
     const url = normalizeUrl(rawUrl);
@@ -610,11 +698,20 @@
       if (l) {
         l.name = name;
         l.url = url;
+        l.description = description;
+        l.updatedAt = now;
         toast("Link updated");
       }
     } else {
       if (!f.links) f.links = [];
-      f.links.push({ id: uid(), name, url, createdAt: now });
+      f.links.push({
+        id: uid(),
+        name,
+        url,
+        description,
+        createdAt: now,
+        updatedAt: now
+      });
       toast("Link saved");
     }
     f.updatedAt = now;
@@ -641,6 +738,67 @@
     }
   });
 
+  if (linkDescInput) {
+    linkDescInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        linkSaveBtn.click();
+      }
+    });
+  }
+
+  // ---------- Link Info Modal ----------
+  function openLinkInfo(id) {
+    const f = getFile(state.currentFileId);
+    if (!f) return;
+    const l = (f.links || []).find((x) => x.id === id);
+    if (!l) return;
+
+    if (linkInfoTitle) linkInfoTitle.textContent = l.name || "Link Info";
+    if (linkInfoDesc) {
+      if (l.description && l.description.trim()) {
+        linkInfoDesc.textContent = l.description;
+        linkInfoDesc.style.color = "var(--text-main)";
+        linkInfoDesc.style.fontStyle = "normal";
+      } else {
+        linkInfoDesc.textContent = "No description provided for this link. Click Edit to add details.";
+        linkInfoDesc.style.color = "var(--text-soft)";
+        linkInfoDesc.style.fontStyle = "italic";
+      }
+    }
+    if (linkInfoUrl) {
+      linkInfoUrl.textContent = l.url;
+      linkInfoUrl.href = l.url;
+    }
+
+    if (linkInfoOpenBtn) {
+      linkInfoOpenBtn.onclick = () => {
+        window.open(l.url, "_blank", "noopener,noreferrer");
+      };
+    }
+
+    if (linkInfoEditBtn) {
+      linkInfoEditBtn.onclick = () => {
+        closeLinkInfo();
+        openLinkSheet(l.id);
+      };
+    }
+
+    pushHistoryOverlay("linkInfoOverlay");
+    if (linkInfoOverlay) linkInfoOverlay.classList.remove("hidden");
+  }
+
+  function closeLinkInfo() {
+    if (linkInfoOverlay) linkInfoOverlay.classList.add("hidden");
+  }
+
+  if (linkInfoCloseBtn) linkInfoCloseBtn.addEventListener("click", closeLinkInfo);
+  if (linkInfoOverlay) {
+    linkInfoOverlay.addEventListener("click", (e) => {
+      if (e.target === linkInfoOverlay) closeLinkInfo();
+    });
+  }
+
   function askDeleteLink(id) {
     const f = getFile(state.currentFileId);
     if (!f) return;
@@ -649,16 +807,20 @@
     state.pendingDelete = { type: "link", id };
     confirmTitle.textContent = `Delete "${l.name}"?`;
     confirmBody.textContent = "This cannot be undone.";
+    pushHistoryOverlay("confirmOverlay");
     confirmOverlay.classList.remove("hidden");
   }
 
-  // ---------- Confirm sheet ----------
+  // ---------- Confirm Sheet ----------
   confirmCancelBtn.addEventListener("click", () => {
     state.pendingDelete = null;
     confirmOverlay.classList.add("hidden");
   });
   confirmOverlay.addEventListener("click", (e) => {
-    if (e.target === confirmOverlay) { state.pendingDelete = null; confirmOverlay.classList.add("hidden"); }
+    if (e.target === confirmOverlay) {
+      state.pendingDelete = null;
+      confirmOverlay.classList.add("hidden");
+    }
   });
 
   confirmOkBtn.addEventListener("click", () => {
@@ -681,7 +843,7 @@
     render();
   });
 
-  // ---------- Google Account & Cloud Sync ----------
+  // ---------- Account & Auth ----------
   function updateAuthUI(user) {
     state.currentUser = user;
     if (user) {
@@ -741,6 +903,7 @@
 
   if (authBtn) {
     authBtn.addEventListener("click", () => {
+      pushHistoryOverlay("accountOverlay");
       accountOverlay.classList.remove("hidden");
     });
   }
@@ -851,6 +1014,7 @@
     });
   }
 
+  // Sign Out
   if (signOutBtn) {
     signOutBtn.addEventListener("click", async () => {
       try {
@@ -872,13 +1036,90 @@
     });
   }
 
+  // Delete Account
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", () => {
+      accountOverlay.classList.add("hidden");
+      pushHistoryOverlay("deleteAccountConfirmOverlay");
+      if (deleteAccountConfirmOverlay) deleteAccountConfirmOverlay.classList.remove("hidden");
+    });
+  }
+
+  if (deleteAccountCancelBtn) {
+    deleteAccountCancelBtn.addEventListener("click", () => {
+      if (deleteAccountConfirmOverlay) deleteAccountConfirmOverlay.classList.add("hidden");
+    });
+  }
+
+  if (deleteAccountConfirmOverlay) {
+    deleteAccountConfirmOverlay.addEventListener("click", (e) => {
+      if (e.target === deleteAccountConfirmOverlay) deleteAccountConfirmOverlay.classList.add("hidden");
+    });
+  }
+
+  if (deleteAccountConfirmBtn) {
+    deleteAccountConfirmBtn.addEventListener("click", async () => {
+      const user = state.currentUser || (typeof firebase !== "undefined" && firebase.auth && firebase.auth().currentUser);
+      if (!user) {
+        toast("No user logged in.");
+        if (deleteAccountConfirmOverlay) deleteAccountConfirmOverlay.classList.add("hidden");
+        return;
+      }
+
+      deleteAccountConfirmBtn.disabled = true;
+      deleteAccountConfirmBtn.textContent = "Deleting account...";
+
+      try {
+        const uid = user.uid;
+
+        // 1. Delete Firestore user document
+        try {
+          if (typeof firebase !== "undefined" && firebase.firestore) {
+            await firebase.firestore().collection("users").doc(uid).delete();
+          }
+        } catch (dbErr) {
+          console.warn("Firestore delete note:", dbErr);
+        }
+
+        // 2. Unsubscribe cloud listener
+        if (state.unsubscribeCloud) {
+          state.unsubscribeCloud();
+          state.unsubscribeCloud = null;
+        }
+
+        // 3. Delete account in Firebase Auth
+        await user.delete();
+
+        // 4. Wipe local storage & reset state
+        localStorage.removeItem(STORAGE_KEY);
+        state.data = { files: [] };
+        updateAuthUI(null);
+        render();
+
+        if (deleteAccountConfirmOverlay) deleteAccountConfirmOverlay.classList.add("hidden");
+        alert("Your account and all saved data have been permanently deleted.");
+      } catch (err) {
+        console.error("Account delete error:", err);
+        if (err.code === "auth/requires-recent-login") {
+          alert("For security, please Sign Out, sign back in with your credentials, and then tap 'Delete Account' immediately.");
+        } else {
+          alert("Account deletion error: " + (err.message || "Unknown error"));
+        }
+      } finally {
+        deleteAccountConfirmBtn.disabled = false;
+        deleteAccountConfirmBtn.textContent = "Yes, Delete Account";
+      }
+    });
+  }
+
+  // Upload local files to cloud
   if (syncLocalToCloudBtn) {
     syncLocalToCloudBtn.addEventListener("click", async () => {
       if (!state.currentUser || typeof firebase === "undefined") return;
       try {
         const userDoc = firebase.firestore().collection("users").doc(state.currentUser.uid);
         await userDoc.set({ ...state.data, lastSyncedAt: Date.now() }, { merge: true });
-        toast("Local files synced to Google Cloud!");
+        toast("Local files synced to Cloud!");
       } catch (err) {
         alert("Sync failed: " + err.message);
       }
@@ -920,47 +1161,41 @@
         }
       });
     } catch (e) {
-      console.warn("Auth listener setup notice:", e);
+      console.warn("Auth state error:", e);
     }
   }
 
-  // Initialize Firebase if config exists
-  if (initFirebaseApp()) {
-    setupAuthStateListener();
-  }
-
-  // ---------- Standalone PWA Installation ----------
-  let deferredInstallPrompt = null;
+  // ---------- PWA Install Banner & Prompt ----------
+  let deferredPrompt = null;
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
-    deferredInstallPrompt = e;
+    deferredPrompt = e;
 
-    if (!isStandalone) {
-      if (installTopBtn) installTopBtn.style.display = "inline-block";
+    if (!isStandalone && installTopBtn) {
+      installTopBtn.style.display = "inline-block";
       showInstallBanner();
     }
   });
 
   async function triggerInstallPrompt() {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       hideInstallUI();
     }
-    deferredInstallPrompt = null;
+    deferredPrompt = null;
   }
 
   if (installTopBtn) {
-    installTopBtn.addEventListener("click", () => {
-      triggerInstallPrompt();
-    });
+    installTopBtn.addEventListener("click", triggerInstallPrompt);
   }
 
   function showInstallBanner() {
     if (document.getElementById("installBanner") || isStandalone) return;
+
     const banner = document.createElement("div");
     banner.className = "install-banner";
     banner.id = "installBanner";
@@ -972,13 +1207,15 @@
       <div class="install-actions">
         <button id="installNowBtn">Install</button>
         <button class="dismiss" id="installDismissBtn" aria-label="Dismiss">&times;</button>
-      </div>`;
+      </div>
+    `;
+
     mainView.parentElement.insertBefore(banner, mainView);
 
-    document.getElementById("installNowBtn").addEventListener("click", async () => {
-      await triggerInstallPrompt();
+    document.getElementById("installNowBtn").addEventListener("click", triggerInstallPrompt);
+    document.getElementById("installDismissBtn").addEventListener("click", () => {
+      banner.remove();
     });
-    document.getElementById("installDismissBtn").addEventListener("click", () => banner.remove());
   }
 
   function hideInstallUI() {
@@ -989,30 +1226,34 @@
 
   window.addEventListener("appinstalled", () => {
     hideInstallUI();
-    deferredInstallPrompt = null;
+    deferredPrompt = null;
     toast("LinkVault installed successfully!");
   });
 
-  // ---------- Service worker ----------
+  // ---------- Register Service Worker ----------
   if ("serviceWorker" in navigator) {
-    const registerSW = () => {
+    const registerWorker = () => {
       navigator.serviceWorker
         .register("service-worker.js")
         .then((reg) => {
-          console.log("Service Worker registered successfully:", reg.scope);
+          console.log("LinkVault SW registered in scope:", reg.scope);
         })
         .catch((err) => {
-          console.warn("Service Worker registration notice:", err);
+          console.warn("LinkVault SW registration failed:", err);
         });
     };
 
     if (document.readyState === "complete") {
-      registerSW();
+      registerWorker();
     } else {
-      window.addEventListener("load", registerSW);
+      window.addEventListener("load", registerWorker);
     }
   }
 
-  // ---------- Init ----------
+  // ---------- Initialize App ----------
+  initHistory();
+  if (initFirebaseApp()) {
+    setupAuthStateListener();
+  }
   render();
 })();

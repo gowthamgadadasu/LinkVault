@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>LinkVault — My Saved Links</title>
-<meta name="theme-color" content="#1e293b" />
-<meta name="description" content="Personal offline vault for organizing saved links and resources into files." />
+<meta name="theme-color" content="#2563eb" />
+<meta name="description" content="Personal vault for organizing saved links and resources into files." />
 
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -15,7 +15,7 @@
 <link rel="shortcut icon" href="icon-192.png" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="LinkVault" />
 <meta name="application-name" content="LinkVault" />
 
@@ -30,7 +30,7 @@
     <h1 id="pageTitle">LinkVault</h1>
     <button class="icon-btn install-top-btn" id="installTopBtn" aria-label="Install App" title="Install LinkVault as an Application" style="display:none;">&#128229;</button>
     <button class="icon-btn" id="searchToggle" aria-label="Search">&#128269;</button>
-    <button class="icon-btn auth-top-btn" id="authBtn" aria-label="Account" title="Google Account & Cloud Sync">
+    <button class="icon-btn auth-top-btn" id="authBtn" aria-label="Account" title="Account & Cloud Sync">
       <span id="authBtnIcon">&#128100;</span>
       <img id="authBtnAvatar" class="user-avatar-small" style="display:none;" alt="Profile" />
     </button>
@@ -83,17 +83,32 @@
         <div class="user-profile-box">
           <img id="userAvatar" class="user-avatar-large" alt="User Profile" />
           <div class="user-info">
-            <div class="user-name" id="userName">Google User</div>
+            <div class="user-name" id="userName">User</div>
             <div class="user-email" id="userEmail">user@gmail.com</div>
-            <div class="sync-badge">☁️ Synced to Google Cloud</div>
+            <div class="sync-badge">☁️ Synced to Cloud</div>
           </div>
         </div>
-        <button class="btn-secondary" id="syncLocalToCloudBtn" style="margin-top:12px; width:100%;">Upload Local Files to Account</button>
+        <button class="btn-secondary" id="syncLocalToCloudBtn" style="margin-top:14px; width:100%;">Upload Local Files to Account</button>
         <button class="btn-danger" id="signOutBtn" style="margin-top:10px; width:100%;">Sign Out</button>
+        <button class="btn-danger-outline" id="deleteAccountBtn" style="margin-top:10px; width:100%;">🗑️ Delete Account</button>
       </div>
 
       <div class="sheet-actions" style="margin-top:16px;">
         <button class="btn-secondary" id="accountCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account Confirmation Sheet -->
+  <div class="overlay hidden" id="deleteAccountConfirmOverlay">
+    <div class="sheet">
+      <h2 style="color:var(--danger);">Delete Your Account?</h2>
+      <p style="color:var(--ink-soft); font-size:14px; line-height:1.45;">
+        This will permanently delete your user account and all your cloud-saved files and links from the database. This action cannot be undone.
+      </p>
+      <div class="sheet-actions">
+        <button class="btn-secondary" id="deleteAccountCancelBtn">Cancel</button>
+        <button class="btn-danger" id="deleteAccountConfirmBtn">Yes, Delete Account</button>
       </div>
     </div>
   </div>
@@ -119,9 +134,34 @@
       <input type="text" id="linkNameInput" placeholder="e.g. Dynamic Programming Playlist" maxlength="80" />
       <label for="linkUrlInput">Paste the link</label>
       <input type="url" id="linkUrlInput" placeholder="https://..." inputmode="url" />
+      <label for="linkDescInput">Description / Purpose (Optional)</label>
+      <textarea id="linkDescInput" rows="3" placeholder="Explain what this link is for, e.g. tools, guides, documentation..." maxlength="300"></textarea>
       <div class="sheet-actions">
         <button class="btn-secondary" id="linkCancelBtn">Cancel</button>
         <button class="btn-primary" id="linkSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link Description / Info Sheet -->
+  <div class="overlay hidden" id="linkInfoOverlay">
+    <div class="sheet">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="font-size:22px; color:var(--primary);">&#9432;</span>
+        <h2 id="linkInfoTitle" style="margin:0; font-size:20px;">Link Info</h2>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Description / Purpose</div>
+        <p id="linkInfoDesc" class="info-desc"></p>
+      </div>
+      <div class="info-card" style="margin-top:10px;">
+        <div class="info-label">URL</div>
+        <a id="linkInfoUrl" class="info-url" href="#" target="_blank" rel="noopener noreferrer"></a>
+      </div>
+      <div class="sheet-actions" style="margin-top:16px;">
+        <button class="btn-primary" id="linkInfoOpenBtn">Open Link &#8599;</button>
+        <button class="btn-secondary" id="linkInfoEditBtn">&#9998; Edit</button>
+        <button class="btn-secondary" id="linkInfoCloseBtn">Close</button>
       </div>
     </div>
   </div>
