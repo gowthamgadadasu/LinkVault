@@ -490,6 +490,29 @@ main {
 .btn-danger-outline:hover { background: var(--danger-light); }
 .btn-danger-outline:active { transform: scale(0.98); }
 
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--text-soft);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: color 0.15s ease;
+}
+.btn-text:hover {
+  color: var(--danger);
+}
+.btn-text:active {
+  transform: scale(0.98);
+}
+
 /* ---------- Link Info Details Card ---------- */
 .info-card {
   background: var(--bg-page);
