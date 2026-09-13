@@ -19,6 +19,10 @@
 <meta name="apple-mobile-web-app-title" content="LinkVault" />
 <meta name="application-name" content="LinkVault" />
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -29,6 +33,7 @@
     <button class="back-btn" id="backBtn" aria-label="Back">&#8592;</button>
     <h1 id="pageTitle">LinkVault</h1>
     <button class="icon-btn install-top-btn" id="installTopBtn" aria-label="Install App" title="Install LinkVault as an Application" style="display:none;">&#128229;</button>
+    <button class="icon-btn theme-top-btn" id="themeBtn" aria-label="Theme Studio" title="Customize Theme">&#127912;</button>
     <button class="icon-btn" id="searchToggle" aria-label="Search">&#128269;</button>
     <button class="icon-btn auth-top-btn" id="authBtn" aria-label="Account" title="Account & Cloud Sync">
       <span id="authBtnIcon">&#128100;</span>
@@ -183,10 +188,26 @@
   <div class="overlay hidden" id="confirmOverlay">
     <div class="sheet">
       <h2 id="confirmTitle">Delete this?</h2>
-      <p id="confirmBody" style="color:var(--ink-soft); font-size:14px;"></p>
+      <p id="confirmBody" style="color:var(--text-secondary); font-size:14px;"></p>
       <div class="sheet-actions">
         <button class="btn-secondary" id="confirmCancelBtn">Cancel</button>
         <button class="btn-danger" id="confirmOkBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Studio Modal -->
+  <div class="overlay hidden" id="themeOverlay">
+    <div class="sheet theme-sheet">
+      <div class="theme-sheet-header">
+        <div>
+          <h2>🎨 Theme Studio</h2>
+          <p class="theme-sheet-subtitle">Choose your semantic design system theme</p>
+        </div>
+      </div>
+      <div class="theme-grid" id="themeGrid"></div>
+      <div class="sheet-actions" style="margin-top:20px;">
+        <button class="btn-secondary" id="themeCloseBtn">Done</button>
       </div>
     </div>
   </div>

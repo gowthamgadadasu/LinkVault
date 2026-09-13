@@ -1,36 +1,356 @@
-:root {
-  --bg-page: #f8fafc;
-  --bg-card: #ffffff;
-  --border-color: #e2e8f0;
-  --border-focus: #3b82f6;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --primary-border: #bfdbfe;
-  --text-main: #0f172a;
-  --text-blue: #1e40af;
-  --text-soft: #64748b;
-  --link-color: #2563eb;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --danger-light: #fef2f2;
-  --danger-border: #fecaca;
-  --card-shadow: 0 1px 3px rgba(37, 99, 235, 0.04), 0 4px 14px rgba(15, 23, 42, 0.05);
-  --card-shadow-hover: 0 4px 18px rgba(37, 99, 235, 0.12);
-  --radius: 14px;
+/* ============================================================
+   PulsePWA / LinkVault — Multi-Theme Semantic Design System
+   Strict Semantic Token Architecture Specification (DESIGN.md)
+   ============================================================ */
+
+/* ---------- 1. Semantic Token Contract & 10 Theme Profiles ---------- */
+
+/* Theme 1: Midnight (Default - Premium Dark Luxe / Fintech / Crypto) */
+:root, [data-theme="midnight"] {
+  --bg-app: #0B0F19;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #1F2937;
+  --bg-surface-sunken: #070A10;
+  --color-primary: #6366F1;
+  --color-primary-hover: #4F46E5;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #38BDF8;
+  --color-accent: #A855F7;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(99, 102, 241, 0.4);
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #EF4444;
+  --status-info: #3B82F6;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.25);
+  --density-factor: 1.0;
 }
 
-* { box-sizing: border-box; }
+/* Theme 2: Ocean (Calm, Trustworthy / Healthcare, Wealth Management) */
+[data-theme="ocean"] {
+  --bg-app: #F0F7FA;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #E2EEF4;
+  --color-primary: #0284C7;
+  --color-primary-hover: #0369A1;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #0D9488;
+  --color-accent: #06B6D4;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #E2E8F0;
+  --border-strong: #BAE6FD;
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #EF4444;
+  --status-info: #0284C7;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(2, 132, 199, 0.04);
+  --shadow-md: 0 8px 24px -4px rgba(2, 132, 199, 0.08);
+  --shadow-lg: 0 16px 32px -6px rgba(2, 132, 199, 0.12);
+  --density-factor: 1.0;
+}
+
+/* Theme 3: Forest (Natural, Organic, Sustainable, Wellness) */
+[data-theme="forest"] {
+  --bg-app: #F7F8F4;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FEFEFC;
+  --bg-surface-sunken: #ECEFE6;
+  --color-primary: #2D5A27;
+  --color-primary-hover: #22451d;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #5C7C54;
+  --color-accent: #D97706;
+  --text-primary: #1C281B;
+  --text-secondary: #4B5E4A;
+  --text-muted: #889A86;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #E2E7DE;
+  --border-strong: #B8C5B3;
+  --status-success: #16A34A;
+  --status-warning: #D97706;
+  --status-error: #DC2626;
+  --status-info: #2563EB;
+  --font-heading: 'Outfit', -apple-system, sans-serif;
+  --font-body: 'Outfit', -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(45, 90, 39, 0.04);
+  --shadow-md: 0 6px 18px -3px rgba(45, 90, 39, 0.07);
+  --shadow-lg: 0 14px 28px -6px rgba(45, 90, 39, 0.12);
+  --density-factor: 1.0;
+}
+
+/* Theme 4: Sunset (Energetic, Dynamic / Consumer, Fitness, Creator) */
+[data-theme="sunset"] {
+  --bg-app: #FFF9F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #FEECE2;
+  --color-primary: #EA580C;
+  --color-primary-hover: #C2410C;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #E11D48;
+  --color-accent: #F59E0B;
+  --text-primary: #27140B;
+  --text-secondary: #6E4D3E;
+  --text-muted: #A48576;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #FFEDD5;
+  --border-strong: #FED7AA;
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #E11D48;
+  --status-info: #0284C7;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 4px rgba(234, 88, 12, 0.06);
+  --shadow-md: 0 10px 24px -4px rgba(234, 88, 12, 0.12);
+  --shadow-lg: 0 18px 36px -6px rgba(234, 88, 12, 0.16);
+  --density-factor: 1.0;
+}
+
+/* Theme 5: Paper (Editorial, Literary, Scholarly, Deliberate) */
+[data-theme="paper"] {
+  --bg-app: #F9F6F0;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #EFECE4;
+  --color-primary: #1A1918;
+  --color-primary-hover: #33312E;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #78350F;
+  --color-accent: #9A3412;
+  --text-primary: #181716;
+  --text-secondary: #57534E;
+  --text-muted: #8C867D;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #E7E2D8;
+  --border-strong: #C8C2B5;
+  --status-success: #15803D;
+  --status-warning: #B45309;
+  --status-error: #B91C1C;
+  --status-info: #1D4ED8;
+  --font-heading: 'Lora', Georgia, serif;
+  --font-body: 'Lora', Georgia, serif;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(24, 23, 22, 0.03);
+  --shadow-md: 0 2px 8px rgba(24, 23, 22, 0.05);
+  --shadow-lg: 0 6px 14px rgba(24, 23, 22, 0.08);
+  --density-factor: 1.0;
+}
+
+/* Theme 6: Monochrome (Minimalist, Brutalist Bauhaus, High Contrast) */
+[data-theme="monochrome"] {
+  --bg-app: #F4F4F4;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #E8E8E8;
+  --color-primary: #000000;
+  --color-primary-hover: #262626;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #525252;
+  --color-accent: #171717;
+  --text-primary: #000000;
+  --text-secondary: #404040;
+  --text-muted: #737373;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #000000;
+  --border-strong: #000000;
+  --status-success: #000000;
+  --status-warning: #525252;
+  --status-error: #000000;
+  --status-info: #000000;
+  --font-heading: 'Space Grotesk', monospace, sans-serif;
+  --font-body: 'Space Grotesk', monospace, sans-serif;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 0px;
+  --shadow-sm: 2px 2px 0px #000000;
+  --shadow-md: 4px 4px 0px #000000;
+  --shadow-lg: 6px 6px 0px #000000;
+  --density-factor: 1.0;
+}
+
+/* Theme 7: Cyber (Experimental, Terminal HUD, Synthwave Night) */
+[data-theme="cyber"] {
+  --bg-app: #050811;
+  --bg-surface: #0C1222;
+  --bg-surface-elevated: #15203B;
+  --bg-surface-sunken: #020409;
+  --color-primary: #00FF9D;
+  --color-primary-hover: #00CC7D;
+  --color-primary-contrast: #050811;
+  --color-secondary: #FF007F;
+  --color-accent: #00E5FF;
+  --text-primary: #EDF2F7;
+  --text-secondary: #7E90B8;
+  --text-muted: #48597E;
+  --text-on-primary: #050811;
+  --border-subtle: rgba(0, 255, 157, 0.2);
+  --border-strong: #00FF9D;
+  --status-success: #00FF9D;
+  --status-warning: #FFB703;
+  --status-error: #FF0055;
+  --status-info: #00E5FF;
+  --font-heading: 'JetBrains Mono', monospace;
+  --font-body: 'JetBrains Mono', monospace;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 0 8px rgba(0, 255, 157, 0.15);
+  --shadow-md: 0 0 15px rgba(0, 255, 157, 0.25), inset 0 0 10px rgba(0, 255, 157, 0.08);
+  --shadow-lg: 0 0 25px rgba(0, 255, 157, 0.35);
+  --density-factor: 1.0;
+}
+
+/* Theme 8: Professional (Enterprise, SaaS, B2B Standard) */
+[data-theme="professional"] {
+  --bg-app: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #F1F5F9;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #475569;
+  --color-accent: #4F46E5;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #CBD5E1;
+  --border-strong: #94A3B8;
+  --status-success: #16A34A;
+  --status-warning: #D97706;
+  --status-error: #DC2626;
+  --status-info: #2563EB;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  --density-factor: 1.0;
+}
+
+/* Theme 9: Aurora (Nordic Frost, Ethereal Glassmorphism) */
+[data-theme="aurora"] {
+  --bg-app: #F4F3FA;
+  --bg-surface: rgba(255, 255, 255, 0.86);
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #EBE7F5;
+  --color-primary: #7C3AED;
+  --color-primary-hover: #6D28D9;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #EC4899;
+  --color-accent: #3B82F6;
+  --text-primary: #1E1B4B;
+  --text-secondary: #5B5382;
+  --text-muted: #8E86B0;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: rgba(124, 58, 237, 0.12);
+  --border-strong: rgba(124, 58, 237, 0.28);
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #EF4444;
+  --status-info: #7C3AED;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 2px 8px rgba(124, 58, 237, 0.06);
+  --shadow-md: 0 12px 32px -4px rgba(124, 58, 237, 0.12);
+  --shadow-lg: 0 20px 40px -6px rgba(124, 58, 237, 0.18);
+  --density-factor: 1.0;
+}
+
+/* Theme 10: Terracotta (Warm Mediterranean, Earthy Artisan, Hospitality) */
+[data-theme="terracotta"] {
+  --bg-app: #FDFBF7;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-sunken: #F5EFE6;
+  --color-primary: #C2593F;
+  --color-primary-hover: #A7472E;
+  --color-primary-contrast: #FFFFFF;
+  --color-secondary: #606C38;
+  --color-accent: #DDA15E;
+  --text-primary: #28231D;
+  --text-secondary: #5C5245;
+  --text-muted: #8C8173;
+  --text-on-primary: #FFFFFF;
+  --border-subtle: #EDE5D8;
+  --border-strong: #D8C8B4;
+  --status-success: #15803D;
+  --status-warning: #D97706;
+  --status-error: #DC2626;
+  --status-info: #2563EB;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(194, 89, 63, 0.04);
+  --shadow-md: 0 8px 20px -3px rgba(194, 89, 63, 0.08);
+  --shadow-lg: 0 16px 30px -6px rgba(194, 89, 63, 0.14);
+  --density-factor: 1.0;
+}
+
+/* ---------- 2. Base & Application Shell Reset ---------- */
+
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: var(--bg-page);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #app {
@@ -40,14 +360,16 @@ html, body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border-left: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
   position: relative;
-  box-shadow: 0 0 40px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-md);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-/* ---------- Top bar ---------- */
+/* ---------- 3. Header & Top Bar ---------- */
+
 header.topbar {
   position: sticky;
   top: 0;
@@ -56,15 +378,13 @@ header.topbar {
   align-items: center;
   gap: 12px;
   padding: 16px 20px 14px;
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 @media (min-width: 768px) {
   header.topbar {
     padding: 20px 32px 18px;
-  }
-  header.topbar h1 {
-    font-size: 26px;
   }
 }
 
@@ -73,7 +393,7 @@ header.topbar .back-btn {
   background: none;
   border: none;
   font-size: 24px;
-  color: var(--primary);
+  color: var(--color-primary);
   cursor: pointer;
   line-height: 1;
   padding: 4px 8px 4px 0;
@@ -88,33 +408,50 @@ header.topbar h1 {
   font-weight: 700;
   letter-spacing: -0.3px;
   flex: 1;
-  color: var(--text-blue);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+@media (min-width: 768px) {
+  header.topbar h1 {
+    font-size: 26px;
+  }
 }
 
 header.topbar .icon-btn {
   background: none;
   border: none;
   font-size: 20px;
-  color: var(--text-blue);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 8px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
-header.topbar .icon-btn:hover { background: var(--primary-light); }
-header.topbar .icon-btn:active { background: var(--primary-border); }
+header.topbar .icon-btn:hover {
+  background-color: var(--bg-surface-sunken);
+  color: var(--color-primary);
+}
+header.topbar .icon-btn:active {
+  transform: scale(0.92);
+}
 
-/* ---------- Search ---------- */
+.theme-top-btn {
+  font-size: 19px !important;
+}
+
+/* ---------- 4. Search Bar ---------- */
+
 .search-wrap {
   padding: 12px 20px 8px;
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 @media (min-width: 768px) {
   .search-wrap {
@@ -123,28 +460,30 @@ header.topbar .icon-btn:active { background: var(--primary-border); }
 }
 .search-wrap input {
   width: 100%;
-  padding: 10px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-page);
-  font-family: inherit;
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface-sunken);
+  font-family: var(--font-body);
   font-size: 14.5px;
-  color: var(--text-main);
-  transition: border-color 0.15s, background-color 0.15s;
+  color: var(--text-primary);
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 .search-wrap input:focus {
   outline: none;
-  border-color: var(--primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: var(--color-primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
-/* ---------- Lists ---------- */
+/* ---------- 5. Lists & Master Container ---------- */
+
 main {
   flex: 1;
   overflow-y: auto;
   padding: 16px 20px 110px;
-  background: #ffffff;
+  background-color: var(--bg-surface);
+  transition: background-color 0.25s ease;
 }
 @media (min-width: 768px) {
   main {
@@ -155,21 +494,24 @@ main {
 .empty-state {
   margin-top: 22vh;
   text-align: center;
-  color: var(--text-soft);
+  color: var(--text-muted);
   padding: 0 30px;
 }
 .empty-state .glyph {
   font-size: 44px;
   display: block;
   margin-bottom: 12px;
-  color: var(--primary);
+  color: var(--color-primary);
 }
 .empty-state p {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-soft);
+  color: var(--text-muted);
+  font-family: var(--font-heading);
   margin: 0;
 }
+
+/* ---------- 6. File / Notebook Cards ---------- */
 
 .file-grid {
   display: grid;
@@ -184,22 +526,22 @@ main {
 }
 
 .file-card {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--card-shadow);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: calc(16px * var(--density-factor));
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   position: relative;
   min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 .file-card:hover {
-  border-color: var(--primary-border);
-  box-shadow: var(--card-shadow-hover);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
 }
 .file-card:active {
   transform: scale(0.98);
@@ -217,17 +559,18 @@ main {
 .file-card .file-tag {
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--primary);
-  background: var(--primary-light);
-  border: 1px solid var(--primary-border);
+  color: var(--color-primary);
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 .file-card .file-name {
-  font-size: 16px;
+  font-size: 16.5px;
   font-weight: 700;
-  color: var(--text-blue);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
   word-break: break-word;
   line-height: 1.3;
   margin-bottom: 6px;
@@ -235,21 +578,24 @@ main {
 }
 .file-card .file-meta {
   font-size: 11.5px;
-  color: var(--text-soft);
+  color: var(--text-muted);
+  font-family: var(--font-body);
 }
 
-/* ---------- Links List ---------- */
+/* ---------- 7. Link List Items ---------- */
+
 .link-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 10px;
-  border-radius: 10px;
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.12s ease;
+  gap: 14px;
+  padding: calc(14px * var(--density-factor)) calc(12px * var(--density-factor));
+  border-radius: var(--radius-md);
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  transition: background-color 0.15s ease;
 }
 .link-row:hover {
-  background: var(--bg-page);
+  background-color: var(--bg-surface-sunken);
 }
 .link-row .link-main {
   flex: 1;
@@ -259,45 +605,47 @@ main {
 .link-row .link-name {
   font-size: 16px;
   font-weight: 700;
-  color: var(--link-color);
+  color: var(--color-primary);
+  font-family: var(--font-heading);
   word-break: break-word;
   line-height: 1.3;
   margin-bottom: 2px;
 }
 .link-row .link-url {
   font-size: 12.5px;
-  color: var(--text-soft);
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: var(--font-body);
 }
 
-/* Info and Row Action buttons */
+/* Info and Action Buttons */
 .link-row .row-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .info-btn {
-  background: var(--primary-light);
-  border: 1px solid var(--primary-border);
-  color: var(--primary);
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: bold;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, transform 0.1s;
+  transition: background-color 0.15s, color 0.15s, transform 0.1s;
   padding: 0;
 }
 .info-btn:hover {
-  background: var(--primary);
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
 }
 .info-btn:active {
   transform: scale(0.92);
@@ -308,40 +656,34 @@ main {
   border: none;
   font-size: 17px;
   padding: 6px;
-  color: var(--text-soft);
+  color: var(--text-muted);
   cursor: pointer;
-  border-radius: 6px;
-  transition: background 0.15s, color 0.15s;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s, color 0.15s;
 }
 .link-row .row-actions button.action-btn:hover {
-  background: var(--primary-light);
-  color: var(--primary);
+  background-color: var(--bg-surface-elevated);
+  color: var(--color-primary);
 }
 .link-row .row-actions button.action-btn:active {
-  color: var(--danger);
+  color: var(--status-error);
 }
 
-/* ---------- Top bar Install Button ---------- */
-.install-top-btn {
-  font-size: 18px !important;
-  color: var(--primary) !important;
-  padding: 4px 6px !important;
-}
+/* ---------- 8. Floating Action Button (FAB) ---------- */
 
-/* ---------- FAB ---------- */
 .fab {
   position: fixed;
   bottom: 28px;
   right: 28px;
   width: 60px;
   height: 60px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #ffffff;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   border: none;
   font-size: 32px;
   font-weight: 300;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
   z-index: 30;
   display: flex;
@@ -356,15 +698,21 @@ main {
     right: calc((100vw - 1320px) / 2 + 28px);
   }
 }
-.fab:hover { background: var(--primary-hover); transform: scale(1.06); }
-.fab:active { transform: scale(0.94); }
+.fab:hover {
+  background-color: var(--color-primary-hover);
+  transform: scale(1.06);
+}
+.fab:active {
+  transform: scale(0.94);
+}
 
-/* ---------- Modal / Sheet ---------- */
+/* ---------- 9. Modal Overlays & Sheets ---------- */
+
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(3px);
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -380,15 +728,18 @@ main {
 }
 
 .sheet {
-  background: #ffffff;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
   width: 100%;
   max-width: 520px;
-  border-radius: 20px;
-  padding: 26px 24px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: calc(26px * var(--density-factor)) calc(24px * var(--density-factor));
+  box-shadow: var(--shadow-lg);
   max-height: 90vh;
   overflow-y: auto;
   margin: auto;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 @media (max-width: 640px) {
   .overlay {
@@ -396,34 +747,37 @@ main {
     padding: 0;
   }
   .sheet {
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     padding: 22px 20px calc(24px + env(safe-area-inset-bottom));
     max-width: 100%;
   }
 }
+
 .sheet h2 {
   margin: 0 0 16px;
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-blue);
+  font-family: var(--font-heading);
+  color: var(--text-primary);
 }
 .sheet label {
   display: block;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-secondary);
   margin: 14px 0 5px;
+  font-family: var(--font-body);
 }
 .sheet input, .sheet select, .sheet textarea {
   width: 100%;
-  padding: 11px 13px;
-  border-radius: 10px;
-  border: 1.5px solid var(--border-color);
-  font-family: inherit;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-body);
   font-size: 15px;
-  background: var(--bg-page);
-  color: var(--text-main);
-  transition: border-color 0.15s, background-color 0.15s;
+  background-color: var(--bg-surface-sunken);
+  color: var(--text-primary);
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 .sheet textarea {
   resize: vertical;
@@ -431,9 +785,9 @@ main {
 }
 .sheet input:focus, .sheet textarea:focus, .sheet select:focus {
   outline: none;
-  border-color: var(--primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: var(--color-primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 .sheet-actions {
@@ -443,58 +797,77 @@ main {
 }
 .sheet-actions button {
   flex: 1;
-  padding: 12px;
-  border-radius: 10px;
+  padding: calc(12px * var(--density-factor));
+  border-radius: var(--radius-md);
   border: none;
-  font-family: inherit;
+  font-family: var(--font-heading);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s, background-color 0.15s;
 }
 .sheet-actions button:active { transform: scale(0.98); }
 
+/* ---------- 10. Semantic Buttons System ---------- */
+
 .btn-primary {
-  background: var(--primary);
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   border: none;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-heading);
+  font-weight: 600;
 }
-.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
 
 .btn-secondary {
-  background: #ffffff;
-  color: var(--text-blue);
-  border: 1.5px solid var(--border-color) !important;
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle) !important;
+  font-family: var(--font-heading);
+  font-weight: 500;
 }
-.btn-secondary:hover { background: var(--primary-light); }
+.btn-secondary:hover {
+  background-color: var(--bg-surface-sunken);
+}
 
 .btn-danger {
-  background: var(--danger);
+  background-color: var(--status-error);
   color: #ffffff;
   border: none;
+  font-family: var(--font-heading);
+  font-weight: 600;
 }
-.btn-danger:hover { background: var(--danger-hover); }
+.btn-danger:hover {
+  opacity: 0.9;
+}
 
 .btn-danger-outline {
-  background: #ffffff;
-  color: var(--danger);
-  border: 1.5px solid var(--danger-border) !important;
-  font-family: inherit;
+  background-color: transparent;
+  color: var(--status-error);
+  border: 1px solid var(--status-error) !important;
+  font-family: var(--font-heading);
   font-size: 14px;
-  font-weight: 700;
-  border-radius: 10px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
   padding: 11px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color 0.15s;
 }
-.btn-danger-outline:hover { background: var(--danger-light); }
-.btn-danger-outline:active { transform: scale(0.98); }
+.btn-danger-outline:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+.btn-danger-outline:active {
+  transform: scale(0.98);
+}
 
 .btn-text {
   background: none;
   border: none;
-  color: var(--text-soft);
-  font-family: inherit;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
   font-size: 14.5px;
   font-weight: 600;
   padding: 10px;
@@ -507,23 +880,25 @@ main {
   transition: color 0.15s ease;
 }
 .btn-text:hover {
-  color: var(--danger);
+  color: var(--status-error);
 }
 .btn-text:active {
   transform: scale(0.98);
 }
 
-/* ---------- Link Info Details Card ---------- */
+/* ---------- 11. Link Info Details Card ---------- */
+
 .info-card {
-  background: var(--bg-page);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 12px 14px;
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
 }
 .info-label {
   font-size: 12px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--color-primary);
+  font-family: var(--font-heading);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
@@ -531,52 +906,59 @@ main {
 .info-desc {
   margin: 0;
   font-size: 14.5px;
-  color: var(--text-main);
+  color: var(--text-primary);
   line-height: 1.45;
   word-break: break-word;
   white-space: pre-wrap;
+  font-family: var(--font-body);
 }
 .info-url {
   font-size: 14px;
-  color: var(--link-color);
+  color: var(--color-primary);
   text-decoration: underline;
   word-break: break-all;
   display: block;
+  font-family: var(--font-body);
 }
 
-/* ---------- Toast ---------- */
+/* ---------- 12. Toast Notifications ---------- */
+
 .toast {
   position: fixed;
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background: #0f172a;
-  color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 20px;
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
   font-size: 14px;
   font-weight: 500;
+  font-family: var(--font-heading);
   z-index: 60;
   opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: none;
   max-width: 85%;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  box-shadow: var(--shadow-lg);
 }
 .toast.show { opacity: 1; }
 
-/* ---------- Install Banner ---------- */
+/* ---------- 13. Install Banner ---------- */
+
 .install-banner {
-  margin: 10px 14px 6px;
-  background: var(--primary-light);
-  border: 1px solid var(--primary-border);
-  border-radius: 12px;
-  padding: 12px 14px;
+  margin: 10px 16px 8px;
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
 }
 .install-banner .install-info {
   display: flex;
@@ -588,11 +970,12 @@ main {
 .install-banner .install-title {
   font-weight: 700;
   font-size: 14px;
-  color: var(--text-blue);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
 }
 .install-banner .install-desc {
   font-size: 12px;
-  color: var(--text-soft);
+  color: var(--text-secondary);
   line-height: 1.3;
 }
 .install-banner .install-actions {
@@ -601,12 +984,12 @@ main {
   gap: 6px;
 }
 .install-banner button#installNowBtn {
-  background: var(--primary);
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 8px 14px;
-  font-family: inherit;
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -618,7 +1001,7 @@ main {
 .install-banner .dismiss {
   background: none;
   border: none;
-  color: var(--text-soft);
+  color: var(--text-muted);
   font-size: 20px;
   line-height: 1;
   padding: 4px 6px;
@@ -626,7 +1009,8 @@ main {
 }
 .install-banner.hidden { display: none; }
 
-/* ---------- Account & Auth ---------- */
+/* ---------- 14. Account & Authentication UI ---------- */
+
 .auth-top-btn {
   font-size: 20px !important;
   display: flex !important;
@@ -638,47 +1022,47 @@ main {
 .user-avatar-small {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   object-fit: cover;
-  border: 1.5px solid var(--primary);
+  border: 1.5px solid var(--color-primary);
 }
 
 .account-desc {
   font-size: 14px;
-  color: var(--text-soft);
+  color: var(--text-secondary);
   line-height: 1.45;
   margin: 0 0 16px;
 }
 
 .btn-google {
   width: 100%;
-  background: #ffffff;
-  color: var(--text-main);
-  border: 1.5px solid var(--border-color);
-  border-radius: 10px;
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   padding: 12px 16px;
-  font-family: inherit;
+  font-family: var(--font-heading);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 .btn-google:hover {
-  background: var(--primary-light);
-  border-color: var(--primary-border);
+  background-color: var(--bg-surface-sunken);
+  border-color: var(--border-strong);
 }
 .btn-google:active { transform: scale(0.98); }
 
 .user-profile-box {
-  background: var(--bg-page);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 14px;
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -687,9 +1071,9 @@ main {
 .user-avatar-large {
   width: 52px;
   height: 52px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   object-fit: cover;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--color-primary);
 }
 
 .user-info {
@@ -699,14 +1083,15 @@ main {
 .user-name {
   font-weight: 700;
   font-size: 16px;
-  color: var(--text-blue);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .user-email {
   font-size: 13px;
-  color: var(--text-soft);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -716,14 +1101,15 @@ main {
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  color: #1e40af;
-  background: #dbeafe;
+  color: var(--color-primary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   margin-top: 5px;
 }
 
-/* Auth divider */
+/* Auth Divider */
 .auth-divider {
   display: flex;
   align-items: center;
@@ -735,52 +1121,52 @@ main {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--border-color);
+  background-color: var(--border-subtle);
 }
 .auth-divider span {
   font-size: 12.5px;
-  color: var(--text-soft);
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
-/* Email auth form */
+/* Email Auth Form */
 #emailAuthForm label {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-secondary);
   margin: 10px 0 4px;
 }
 #emailAuthForm input {
   width: 100%;
   padding: 10px 12px;
-  border-radius: 8px;
-  border: 1.5px solid var(--border-color);
-  font-family: inherit;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-body);
   font-size: 14px;
-  background: var(--bg-page);
-  color: var(--text-main);
+  background-color: var(--bg-surface-sunken);
+  color: var(--text-primary);
   box-sizing: border-box;
 }
 #emailAuthForm input:focus {
   outline: none;
-  border-color: var(--primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: var(--color-primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
-/* Auth toggle row */
+/* Auth Toggle Row */
 .auth-toggle-row {
   text-align: center;
   margin-top: 14px;
   font-size: 13px;
-  color: var(--text-soft);
+  color: var(--text-secondary);
 }
 .btn-link-inline {
   background: none;
   border: none;
-  color: var(--primary);
-  font-family: inherit;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -788,4 +1174,106 @@ main {
   text-underline-offset: 2px;
   padding: 0;
   margin-left: 4px;
+}
+
+/* ---------- 15. Theme Studio Modal UI ---------- */
+
+.theme-sheet {
+  max-width: 640px !important;
+}
+.theme-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.theme-sheet-header h2 {
+  margin: 0 0 4px;
+}
+.theme-sheet-subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+@media (min-width: 580px) {
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+.theme-card {
+  background-color: var(--bg-surface-sunken);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.theme-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+.theme-card.active {
+  border-color: var(--color-primary);
+  background-color: var(--bg-surface-elevated);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.theme-card-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+}
+.theme-active-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  display: none;
+}
+.theme-card.active .theme-active-badge {
+  display: inline-block;
+}
+
+.theme-card-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.theme-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.theme-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: inline-block;
 }

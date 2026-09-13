@@ -8,29 +8,28 @@ LinkVault is a personal alternative to browser bookmarks: a clean vault app wher
 
 ## Features
 
-- 🌐 **Google Account & Multi-Device Sync** — sign in with your Google email to access and sync your files and links automatically across all your phones, laptops, and tablets
-- 📁 **Files for your links** — create files to group related links together (e.g. "React Tutorials", "Interview Prep", "Design Systems") without clutter
-- 🔗 **Name-your-own links** — every saved link is stored under a name you choose; tapping that name opens the real URL in a new tab
-- 📲 **Installable Standalone App** — modern PWA with `manifest.json` and service worker, installable directly as a native desktop or mobile application (not a simple Chrome shortcut)
-- 📴 **Fully offline** — a service worker caches the whole app shell and Firestore provides offline persistence, so it works with no internet connection
-- ✏️ **Full CRUD** — create, rename, or delete files and links, with a confirmation step before anything is removed
-- 🔍 **Search** — filter files or the links inside a file by name
-- ✍️ **Notepad-style UI** — ruled-paper background, serif typography, minimal and distraction-free
-- 🔒 **Private by design** — guest data lives locally on your device (`localStorage`); signed-in data is stored in your private Firebase Firestore database
+- 🎨 **10 Semantic Themes (Theme Studio)** — switch dynamically between 10 design profiles (Midnight, Ocean, Forest, Sunset, Paper, Monochrome, Cyber, Professional, Aurora, Terracotta) with instant live previews
+- 🌐 **Multi-Device Cloud Sync** — sign in with Google or Email/Password to sync your files and links automatically across phones, laptops, and tablets
+- 📁 **Files & Notebooks for your links** — create folders to group related links together without clutter
+- 🔗 **Name-your-own links & descriptions** — give every link a title, paste the URL, and add custom notes with a 1-tap `ⓘ` info viewer
+- 📲 **Installable Standalone PWA** — install directly as a native desktop or mobile application with custom adaptive chain-link icons
+- 📴 **Fully offline** — service worker caches all assets and Firestore provides offline persistence
+- ⚡ **Gestures & Shortcuts** — double-click, right-click, or long-press to rename/delete; press Enter to save instantly
+- 🔒 **Private & Secure** — includes automatic account deletion and database record purging
 
 ---
 
 ## Tech stack
 
-Plain HTML, CSS, and JavaScript with modular Firebase Web SDKs (CDN) — no build tools or package manager needed.
+Plain HTML, CSS, and JavaScript with modular Firebase Web SDKs (CDN) — zero build tools or dependencies needed.
 
 | File | Purpose |
 |---|---|
-| `index.html` | App shell, modals & markup |
-| `style.css` | Notepad theme, auth UI, layout, responsive rules |
-| `app.js` | State management, rendering, CRUD, Google Auth, real-time sync & PWA installation |
-| `manifest.json` | PWA metadata — app id, standalone display mode, display override, icons |
-| `service-worker.js` | Caches app assets for offline use (v11) |
+| `index.html` | App shell, Theme Studio modal, and overlays |
+| `style.css` | 10 semantic design profiles, responsive rules & tokens |
+| `app.js` | State management, CRUD, Theme Studio, Firebase Auth & sync |
+| `manifest.json` | PWA metadata — app id, standalone display mode, icons |
+| `service-worker.js` | Caches app assets for offline use (v20) |
 | `_headers` | Netlify headers for manifest and service worker |
 | `icon-192.png` | 192px app icon |
 | `icon-512.png` | 512px app icon |

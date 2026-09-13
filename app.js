@@ -166,6 +166,10 @@
   const confirmBody = $("confirmBody");
   const confirmOkBtn = $("confirmOkBtn");
   const confirmCancelBtn = $("confirmCancelBtn");
+  const themeBtn = $("themeBtn");
+  const themeOverlay = $("themeOverlay");
+  const themeGrid = $("themeGrid");
+  const themeCloseBtn = $("themeCloseBtn");
 
   const toastEl = $("toast");
 
@@ -1230,6 +1234,148 @@
     toast("LinkVault installed successfully!");
   });
 
+  // ---------- Theme Studio (10 Multi-Theme Semantic System) ----------
+  const THEMES = [
+    {
+      id: "midnight",
+      name: "Midnight",
+      desc: "Luxury Fintech & Crypto Dark",
+      themeColor: "#0B0F19",
+      swatches: ["#0B0F19", "#111827", "#6366F1", "#38BDF8"]
+    },
+    {
+      id: "ocean",
+      name: "Ocean",
+      desc: "Calm Healthcare & Wealth Cloud",
+      themeColor: "#0284C7",
+      swatches: ["#F0F7FA", "#FFFFFF", "#0284C7", "#0D9488"]
+    },
+    {
+      id: "forest",
+      name: "Forest",
+      desc: "Natural Pine Moss & Organic Sage",
+      themeColor: "#2D5A27",
+      swatches: ["#F7F8F4", "#FFFFFF", "#2D5A27", "#D97706"]
+    },
+    {
+      id: "sunset",
+      name: "Sunset",
+      desc: "Energetic Tangerine & Dusk Glow",
+      themeColor: "#EA580C",
+      swatches: ["#FFF9F5", "#FFFFFF", "#EA580C", "#E11D48"]
+    },
+    {
+      id: "paper",
+      name: "Paper",
+      desc: "Editorial Scholarly Bookbinders Ink",
+      themeColor: "#1A1918",
+      swatches: ["#F9F6F0", "#FFFFFF", "#1A1918", "#78350F"]
+    },
+    {
+      id: "monochrome",
+      name: "Monochrome",
+      desc: "Brutalist Bauhaus High Contrast",
+      themeColor: "#000000",
+      swatches: ["#F4F4F4", "#FFFFFF", "#000000", "#525252"]
+    },
+    {
+      id: "cyber",
+      name: "Cyber",
+      desc: "Terminal HUD Matrix Neon",
+      themeColor: "#00FF9D",
+      swatches: ["#050811", "#0C1222", "#00FF9D", "#FF007F"]
+    },
+    {
+      id: "professional",
+      name: "Professional",
+      desc: "Enterprise SaaS Royal Blue",
+      themeColor: "#2563EB",
+      swatches: ["#F8FAFC", "#FFFFFF", "#2563EB", "#475569"]
+    },
+    {
+      id: "aurora",
+      name: "Aurora",
+      desc: "Glassmorphic Nordic Violet Glow",
+      themeColor: "#7C3AED",
+      swatches: ["#F4F3FA", "#FFFFFF", "#7C3AED", "#EC4899"]
+    },
+    {
+      id: "terracotta",
+      name: "Terracotta",
+      desc: "Mediterranean Raw Linen & Baked Clay",
+      themeColor: "#C2593F",
+      swatches: ["#FDFBF7", "#FFFFFF", "#C2593F", "#606C38"]
+    }
+  ];
+
+  const THEME_STORAGE_KEY = "pulse_pwa_theme";
+
+  function getActiveTheme() {
+    return localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem("linkvault_theme") || "midnight";
+  }
+
+  function applyTheme(themeId) {
+    const t = THEMES.find((x) => x.id === themeId) || THEMES[0];
+    document.documentElement.setAttribute("data-theme", t.id);
+    localStorage.setItem(THEME_STORAGE_KEY, t.id);
+    localStorage.setItem("linkvault_theme", t.id);
+
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme && t.themeColor) {
+      metaTheme.setAttribute("content", t.themeColor);
+    }
+
+    renderThemeGrid();
+  }
+
+  function renderThemeGrid() {
+    if (!themeGrid) return;
+    const currentTheme = getActiveTheme();
+    themeGrid.innerHTML = THEMES.map((t) => {
+      const isActive = t.id === currentTheme;
+      return `
+        <div class="theme-card ${isActive ? "active" : ""}" data-theme-id="${t.id}">
+          <div class="theme-card-top">
+            <span class="theme-card-name">${escapeHtml(t.name)}</span>
+            <span class="theme-active-badge">Active</span>
+          </div>
+          <div class="theme-card-desc">${escapeHtml(t.desc)}</div>
+          <div class="theme-swatches">
+            ${t.swatches.map((c) => `<span class="theme-swatch" style="background-color:${c}"></span>`).join("")}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    themeGrid.querySelectorAll(".theme-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const tid = card.getAttribute("data-theme-id");
+        if (tid) {
+          applyTheme(tid);
+          toast(`Theme switched to ${tid.charAt(0).toUpperCase() + tid.slice(1)}`);
+        }
+      });
+    });
+  }
+
+  function openThemeModal() {
+    renderThemeGrid();
+    pushHistoryOverlay("themeOverlay");
+    if (themeOverlay) themeOverlay.classList.remove("hidden");
+  }
+
+  function closeThemeModal() {
+    if (themeOverlay) themeOverlay.classList.add("hidden");
+  }
+
+  if (themeBtn) themeBtn.addEventListener("click", openThemeModal);
+  if (themeCloseBtn) themeCloseBtn.addEventListener("click", closeThemeModal);
+  if (themeOverlay) {
+    themeOverlay.addEventListener("click", (e) => {
+      if (e.target === themeOverlay) closeThemeModal();
+    });
+  }
+
   // ---------- Register Service Worker ----------
   if ("serviceWorker" in navigator) {
     const registerWorker = () => {
@@ -1252,6 +1398,7 @@
 
   // ---------- Initialize App ----------
   initHistory();
+  applyTheme(getActiveTheme());
   if (initFirebaseApp()) {
     setupAuthStateListener();
   }
